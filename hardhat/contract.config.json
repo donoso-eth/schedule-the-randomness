@@ -1,0 +1,8 @@
+{
+  "scheduleTheRandomness": {
+    "artifactsPath": "ScheduleTheRandomness.sol/ScheduleTheRandomness.json",
+    "name": "ScheduleTheRandomness",
+    "ctor": ["0xc1C6805B857Bef1f412519C4A842522431aFed39","0x6Eb87EcCe6218Cd0e97299331D2aa5d2e53da5cD"],
+    "jsonName": "schedule_the_randomness"
+  }
+}
