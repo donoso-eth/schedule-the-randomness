@@ -16,6 +16,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { MinimalContract} from 'src/assets/contracts/interfaces/MinimalContract';
 import { AngularContract } from './classes';
 
+import ScheduleRandomnessMetadata from '../../assets/contracts/schedule_the_randomness_metadata.json';
 
 @Injectable({
   providedIn: 'root',
@@ -46,9 +47,9 @@ export class DappInjector implements OnDestroy {
 
 
   constructor(
-    @Inject(DappConfigService) private dappConfig: IDAPP_CONFIG,
+    @Inject(DappConfigService) public dappConfig: IDAPP_CONFIG,
     @Inject(DOCUMENT) private readonly document: any,
-    @Inject('contractMetadata') public contractMetadata: ICONTRACT_METADATA,
+  
     private store: Store
   ) {
     ///// ---------  Blockchain Bootstrap
@@ -194,7 +195,7 @@ async localWallet(index:number) {
   private async contractInitialization() {
 
     const contract = new AngularContract<MinimalContract>({
-      metadata: this.contractMetadata,
+      metadata: ScheduleRandomnessMetadata ,
       provider: this.DAPP_STATE.defaultProvider!,
       signer: this.DAPP_STATE.signer!,
     });

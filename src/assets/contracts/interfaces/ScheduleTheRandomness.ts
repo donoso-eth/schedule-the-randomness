@@ -41,7 +41,11 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
     "owner()": FunctionFragment;
     "qrngUint256Array(uint256)": FunctionFragment;
     "randomness()": FunctionFragment;
+    "rawFulfillRandomWords(uint256,uint256[])": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
+    "requestRandomWords()": FunctionFragment;
+    "s_randomWords(uint256)": FunctionFragment;
+    "s_requestId()": FunctionFragment;
     "setRequestParameters(address,bytes32,address)": FunctionFragment;
     "sponsorWallet()": FunctionFragment;
     "taskIdByBlock(uint256)": FunctionFragment;
@@ -116,7 +120,23 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "rawFulfillRandomWords",
+    values: [BigNumberish, BigNumberish[]]
+  ): string;
+  encodeFunctionData(
     functionFragment: "renounceOwnership",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "requestRandomWords",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "s_randomWords",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "s_requestId",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -201,7 +221,23 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "randomness", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "rawFulfillRandomWords",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "renounceOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "requestRandomWords",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "s_randomWords",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "s_requestId",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -357,9 +393,26 @@ export interface ScheduleTheRandomness extends BaseContract {
 
     randomness(overrides?: CallOverrides): Promise<[number]>;
 
+    rawFulfillRandomWords(
+      requestId: BigNumberish,
+      randomWords: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    requestRandomWords(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    s_randomWords(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    s_requestId(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     setRequestParameters(
       _airnode: string,
@@ -453,9 +506,26 @@ export interface ScheduleTheRandomness extends BaseContract {
 
   randomness(overrides?: CallOverrides): Promise<number>;
 
+  rawFulfillRandomWords(
+    requestId: BigNumberish,
+    randomWords: BigNumberish[],
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   renounceOwnership(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  requestRandomWords(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  s_randomWords(
+    arg0: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  s_requestId(overrides?: CallOverrides): Promise<BigNumber>;
 
   setRequestParameters(
     _airnode: string,
@@ -538,7 +608,22 @@ export interface ScheduleTheRandomness extends BaseContract {
 
     randomness(overrides?: CallOverrides): Promise<number>;
 
+    rawFulfillRandomWords(
+      requestId: BigNumberish,
+      randomWords: BigNumberish[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
+
+    requestRandomWords(overrides?: CallOverrides): Promise<void>;
+
+    s_randomWords(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    s_requestId(overrides?: CallOverrides): Promise<BigNumber>;
 
     setRequestParameters(
       _airnode: string,
@@ -658,9 +743,26 @@ export interface ScheduleTheRandomness extends BaseContract {
 
     randomness(overrides?: CallOverrides): Promise<BigNumber>;
 
+    rawFulfillRandomWords(
+      requestId: BigNumberish,
+      randomWords: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    requestRandomWords(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    s_randomWords(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    s_requestId(overrides?: CallOverrides): Promise<BigNumber>;
 
     setRequestParameters(
       _airnode: string,
@@ -759,9 +861,26 @@ export interface ScheduleTheRandomness extends BaseContract {
 
     randomness(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    rawFulfillRandomWords(
+      requestId: BigNumberish,
+      randomWords: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    requestRandomWords(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    s_randomWords(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    s_requestId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     setRequestParameters(
       _airnode: string,
