@@ -6,6 +6,8 @@ import { FormControl } from '@angular/forms';
 import { DappBaseComponent, DappInjector, Web3Actions, Web3State } from 'angular-web3';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
+import { displayAdress } from '../../helpers/helpers';
+import { ethers, utils } from 'ethers';
 
 @Component({
   selector: 'app-topbar',
@@ -19,48 +21,66 @@ export class AppTopBarComponent extends DappBaseComponent {
   harhdat_local_privKeys: Array<{ key: string; address: string }> = [];
   network!: string;
   address_to_show!: string;
+  userbalance: ethers.BigNumber | undefined;
   constructor(private router: Router, dapp: DappInjector, store: Store<Web3State>) {
     super(dapp, store);
     this.localUserCtrl.valueChanges.pipe(takeUntil(this.destroyHooks)).subscribe((val) => {
       this.dapp.localWallet(val);
-      this.router.navigateByUrl('home');
+   
     });
   }
+
+  utils = utils;
+
+  displayAdress =  displayAdress;
 
   toggleMenu(val: any) {}
 
   toggleTopMenu(val: any) {}
 
   doDisconnect() {
+  
     this.store.dispatch(Web3Actions.chainBusy({ status: true }));
-  //  this.store.dispatch(Web3Actions.disconnectChain({ status: 'force-disconnect' }));
-    this.store.dispatch(Web3Actions.chainBusy({ status: false}));
+   this.store.dispatch(Web3Actions.disconnectChain({ status: 'force-disconnect' }));
+  
   }
 
 
   async  connect() {
 
-    this.dapp.localWallet(1)
-  
-    this.dapp.launchWebModal()
-  
-     this.router.navigate(['landing'])
+    console.log(this.dapp.dappConfig.defaultNetwork!)
+
+    if (this.dapp.dappConfig.defaultNetwork! == "localhost") {
+      this.dapp.localWallet(1)
+    } else {
+      this.dapp.launchWebModal()
+    }  
       
     }
 
   override async hookContractConnected(): Promise<void> {
-    this.address_to_show = await this.signer.getAddress();
+    
+    this.address_to_show = await this.dapp.signerAddress!;
 
     this.network = this.dapp.dappConfig.defaultNetwork!;
-    // console.log(this.network)
+    console.log(this.network)
      if (this.network == 'localhost') {
       this.harhdat_local_privKeys = (await import('../../../../assets/contracts/local_accouts.json')).default;
       const index = this.harhdat_local_privKeys.map((map) => map.address.toLowerCase()).indexOf(this.dapp.signerAddress!.toLowerCase());
 
       this.localUserCtrl.setValue(index + 1, { emitEvent: false });
-    }
 
+    }
     this.router.navigateByUrl('home')
+
+    
+  }
+
+
+  override async hookRefreshBalances(): Promise<void> {
+
+       this.userbalance = await this.dapp.provider?.getBalance(this.dapp.signerAddress!);
+ 
   }
   
 }

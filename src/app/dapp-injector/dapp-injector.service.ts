@@ -17,6 +17,7 @@ import { MinimalContract} from 'src/assets/contracts/interfaces/MinimalContract'
 import { AngularContract } from './classes';
 
 import ScheduleRandomnessMetadata from '../../assets/contracts/schedule_the_randomness_metadata.json';
+import { ScheduleTheRandomness } from '../../assets/contracts/interfaces/ScheduleTheRandomness';
 
 @Injectable({
   providedIn: 'root',
@@ -26,7 +27,7 @@ export class DappInjector implements OnDestroy {
   private destroyHooks: Subject<void> = new Subject();
 
   ///// ---------  DAPP STATE INITIALIZATION
-  DAPP_STATE:IDAPP_STATE<MinimalContract> = {
+  DAPP_STATE:IDAPP_STATE<ScheduleTheRandomness> = {
    
     defaultProvider: null,
     connectedNetwork: null,
@@ -194,7 +195,7 @@ async localWallet(index:number) {
   ///// ---------  Contract Initialization
   private async contractInitialization() {
 
-    const contract = new AngularContract<MinimalContract>({
+    const contract = new AngularContract<ScheduleTheRandomness>({
       metadata: ScheduleRandomnessMetadata ,
       provider: this.DAPP_STATE.defaultProvider!,
       signer: this.DAPP_STATE.signer!,
