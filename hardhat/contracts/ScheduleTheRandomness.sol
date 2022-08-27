@@ -293,8 +293,6 @@ contract ScheduleTheRandomness is
     bytes32 _endpointIdUint256Array,
     address _sponsorWallet
   ) external {
-    // Normally, this function should be protected, as in:
-    // require(msg.sender == owner, "Sender not owner");
     airnode = _airnode;
     endpointIdUint256Array = _endpointIdUint256Array;
     sponsorWallet = _sponsorWallet;
@@ -305,8 +303,8 @@ contract ScheduleTheRandomness is
   function makeRequestAPI3RandomComponents(uint256 size) public {
     qrngUint256Array = [0, 0];
     bytes32 requestId = airnodeRrp.makeFullRequest(
-      airnode,
-      endpointIdUint256Array,
+      airnode, //// airnode provider
+      endpointIdUint256Array, /// type of 
       address(this),
       sponsorWallet,
       address(this),
