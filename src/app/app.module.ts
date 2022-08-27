@@ -16,6 +16,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ButtonModule } from 'primeng/button';
+import { SmartContractService } from './shared/services/smart-contract.service';
 
 @NgModule({
   declarations: [
@@ -31,14 +32,14 @@ import { ButtonModule } from 'primeng/button';
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    DappInjectorModule.forRoot({wallet:'wallet', defaultNetwork:'goerli'}),
+    DappInjectorModule.forRoot({wallet:'local', defaultNetwork:'localhost'}),
     StoreModule.forRoot({web3: we3ReducerFunction}),
     DropdownModule,
     ProgressSpinnerModule,
     ToastModule,
     ButtonModule
   ],
-  providers: [MessageService],
+  providers: [MessageService,SmartContractService ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

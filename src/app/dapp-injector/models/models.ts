@@ -3,6 +3,17 @@ import { AngularContract } from "../classes/contract";
 import { INETWORK, NETWORK_TYPE } from "../constants";
 
 
+export enum PLANSTATUS {
+  WAITING = 'Waiting for next execution',
+  CHECKING_COMPONENTS = 'Waiting for random components',
+  CHECKING_EMPLOYEES = 'Waiting for random employee to run the control',
+  CHECKIMNG_CONTROL_TYPE = 'Waiting for random control type' 
+
+}
+
+export interface ICOMPONENT {
+  id:number, status: 'still' | 'checking' | 'checked', timestamp:number}
+
 
 export interface IDAPP_CONFIG {
   defaultNetwork: string,

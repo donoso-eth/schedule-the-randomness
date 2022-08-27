@@ -14,11 +14,68 @@ import "@api3/airnode-protocol/contracts/rrp/requesters/RrpRequesterV0.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 
-///0x6c3224f9b3fee000a444681d5d45e4532d5ba531
+enum CONTROL_STATUS {
+  STILL,
+  CHECKING,
+  CHECKED
+}
 
-contract ScheduleTheRandomness is OpsReady, RrpRequesterV0, VRFConsumerBaseV2, Ownable {
-  
-//// CHAINLINK VRF
+enum CONTROL_TYPE {
+  EXPRESS,
+  MEDIUM,
+  INTENSIVE
+}
+
+struct QUALITY_CONTROL {
+  uint256 id;
+  uint256 employeeId;
+  uint8[] checked;
+  CONTROL_TYPE controlType;
+}
+
+struct COMPONENT {
+  uint256 timestamp;
+  uint8 id;
+  CONTROL_STATUS status;
+}
+
+contract ScheduleTheRandomness is
+  OpsReady,
+  RrpRequesterV0,
+  VRFConsumerBaseV2,
+  Ownable
+{
+  // #region ======  CONTRACT STATE & EVENTS ===================
+
+  uint256 intervalComponents = 3600; // minimum interval between control twice the same component
+
+  mapping(uint8 => COMPONENT) public components; /// mapping with current state of the components
+
+  uint8[] toCheckComponents; // helper array to be built dynamically with the available controls to check
+
+  bytes32 qualityPlanTaskId; // Gelato TaskId to stop the quality plan
+
+  bool planIsActive = false; // Quality plan running or stopped
+
+  uint256 controlId; // control number
+
+  mapping(uint256 => QUALITY_CONTROL) public controls; // Storage of all controls
+
+  CONTROL_STATUS status; // Current Status od the Control
+
+  //// Events
+
+  event qualityControlStart();
+
+  event randomComponent(uint8 id);
+
+  event controlTypeAvailable();
+
+  event qualityControlDone();
+
+  // #endregion ======  CONTRACT STATE ================
+
+  // #region ======  CHAINLINK VRF STATE ================
   VRFCoordinatorV2Interface COORDINATOR;
   // Your subscription ID.
   uint64 s_subscriptionId;
@@ -30,7 +87,8 @@ contract ScheduleTheRandomness is OpsReady, RrpRequesterV0, VRFConsumerBaseV2, O
   // The gas lane to use, which specifies the maximum gas price to bump to.
   // For a list of available gas lanes on each network,
   // see https://docs.chain.link/docs/vrf-contracts/#configurations
-  bytes32 keyHash = 0x79d3d8832d904592c0bf9818b621522c988bb8b0c05cdc3b15aea1b6e8db0c15;
+  bytes32 keyHash =
+    0x79d3d8832d904592c0bf9818b621522c988bb8b0c05cdc3b15aea1b6e8db0c15;
 
   // Depends on the number of requested values that you want sent to the
   // fulfillRandomWords() function. Storing each word costs about 20,000 gas,
@@ -45,78 +103,195 @@ contract ScheduleTheRandomness is OpsReady, RrpRequesterV0, VRFConsumerBaseV2, O
 
   // For this example, retrieve 2 random values in one request.
   // Cannot exceed VRFCoordinatorV2.MAX_NUM_WORDS.
-  uint32 numWords =  2;
+  uint32 numWords = 1;
 
-  uint256[] public s_randomWords;
+  uint256 public employeeId;
   uint256 public s_requestId;
   address s_owner;
 
-  ////  WITNET
+  // #endregion ======  CHAINLINK VRF STATE ================
+
+  // #region ====== WITNET RANDOMNESS CONTRACT STATE ================
+
   uint32 public randomness;
   uint256 public latestRandomizingBlock;
   mapping(uint256 => bytes32) public taskIdByBlock;
   IWitnetRandomness witnet;
+  // #endregion ====== WITNET RANDOMNESS CONTRACT STATE ================
 
-  //// API3
+  // #region ====== API3 QRNG STATE ================
   event RequestedUint256Array(bytes32 indexed requestId, uint256 size);
   event ReceivedUint256Array(bytes32 indexed requestId, uint256[] response);
 
+  mapping(bytes32 => bool) public expectingRequestWithIdToBeFulfilled;
+
   address public airnode;
-  bytes32 public endpointIdUint256;
   bytes32 public endpointIdUint256Array;
   address public sponsorWallet;
 
   uint256[] public qrngUint256Array;
 
-  mapping(bytes32 => bool) public expectingRequestWithIdToBeFulfilled;
+  // #endregion ====== API3 QRNG STATE ================
 
-  constructor(address payable _ops, IWitnetRandomness _witnetRandomness, address _airnodeRrp,uint64 subscriptionId)
-    OpsReady(_ops) RrpRequesterV0(_airnodeRrp)  VRFConsumerBaseV2(vrfCoordinator)
+  constructor(
+    address payable _ops,
+    IWitnetRandomness _witnetRandomness,
+    address _airnodeRrp,
+    uint64 subscriptionId
+  )
+    OpsReady(_ops)
+    RrpRequesterV0(_airnodeRrp)
+    VRFConsumerBaseV2(vrfCoordinator)
   {
     witnet = _witnetRandomness;
-       COORDINATOR = VRFCoordinatorV2Interface(vrfCoordinator);
+
+    COORDINATOR = VRFCoordinatorV2Interface(vrfCoordinator);
+
     s_owner = msg.sender;
     s_subscriptionId = subscriptionId;
+
+    for (uint8 i = 1; i <= 20; i++) {
+      COMPONENT memory compo = COMPONENT(
+        block.timestamp,
+        i,
+        CONTROL_STATUS.STILL
+      );
+      components[i] = compo;
+    }
   }
 
-  // ============= ============= Create Simple Task with NO Prepayment Use Case Business Logic  ============= ============= //
-  // #region Create Simple Task With NO Prepayment Use Case Business Logic
+  //// ADD contract to Subscription
 
-  /**************************************************************************
-   * Create Simple Task With NO Prepayment Use Case Business Logic
-   * The difference with the simple create task is we will transfer the execution gas fees
-   * at the time of execution, for that we will require our contract to hold balance
-   *
-   * Step 1 : createTaskNoPrepayment()
-   *          - requiere the contract to have funds or to receive funds
-   *          - will create the task, we add ETH as the feetoken
-   *          - will store the taskId
-   *
-   * Step 2 : checkerNoPrepayment() Function.
-   *          - Check If the task can be executed , in this case if we do not have headache
-   *          - returns the execPayload of startPartyNoPrepayment()
-   *
-   * Step 3 : Executable Function: startPartyNoPrepayment()
-   *          - get Fee Details and transfer the requiered funds to Gelato
-   *          - will Start the party setting lastPartyStart to block.timestamp
-   *          - will cause a headache
-   *************************************************************************/
+  function addConsumer() external onlyOwner {
+    // Add a consumer contract to the subscription.
+    COORDINATOR.addConsumer(s_subscriptionId, address(this));
+  }
 
-  function exetest() external onlyOps (){
-      uint256 fee;
+  /// START ORCHRESTRATION
+
+  function startQualityPlan() public {
+    require(
+      planIsActive == false && qualityPlanTaskId == bytes32(0),
+      "PLAN_RUNNING"
+    );
+    planIsActive = true;
+    createQualityPlanTask();
+  }
+
+  function stopQualityControl() public {
+    require(planIsActive == true && qualityPlanTaskId != bytes32(0), "NO_PLAN");
+
+    IOps(ops).cancelTask(qualityPlanTaskId);
+    qualityPlanTaskId = bytes32(0);
+    planIsActive = false;
+  }
+
+  function doQualityControl() public {
+    /// Check Controlled components
+    require(planIsActive == true, "NO_PLAN_ACTIVE");
+
+    require(status == CONTROL_STATUS.STILL, "STILL_RUNNING_PREVIOUS_CONTROL");
+
+    emit qualityControlStart();
+
+    status = CONTROL_STATUS.CHECKING;
+
+    controlId = controlId + 1;
+
+    controls[controlId].id = controlId;
+
+    uint256 fee;
     address feeToken;
 
     (fee, feeToken) = IOps(ops).getFeeDetails();
 
     _transfer(fee, feeToken);
-      cancelTaskById(taskIdByBlock[latestRandomizingBlock]);
+
+    uint8[2] memory retArray = getRandomComponents();
+
+    for (uint256 i = 0; i < 2; i++) {
+      uint8 compoIndex = retArray[i];
+      COMPONENT storage compo = components[compoIndex];
+      compo.status = CONTROL_STATUS.CHECKED;
+      compo.timestamp = block.timestamp;
+    }
+
+    /// Store Quality Control Details
+    for (uint8 i = 1; i <= 20; i++) {
+      COMPONENT memory _compo = components[i];
+      if (_compo.status == CONTROL_STATUS.CHECKED) {
+        controls[controlId].checked.push(i);
+      }
+    }
+
+    getRandomControlType();
   }
 
-  function createTaskFullfillRandomness() public  {
- 
+  function getRandomComponents() public returns (uint8[2] memory retArray) {
+    for (uint8 i = 1; i <= 20; i++) {
+      COMPONENT storage _compo = components[i];
+      if (
+        block.timestamp - _compo.timestamp > intervalComponents &&
+        _compo.status == CONTROL_STATUS.CHECKED
+      ) {
+        _compo.status = CONTROL_STATUS.STILL;
+      } else if (_compo.status == CONTROL_STATUS.STILL) {
+        toCheckComponents.push(_compo.id);
+      }
+    }
+
+    makeRequestUint256Array(2);
+
+    for (uint256 i = 0; i < 2; i++) {
+      uint256 toCheckLength = toCheckComponents.length;
+      uint8 rand = uint8((qrngUint256Array[i] % 20) + 1);
+      uint8 id = toCheckComponents[rand];
+      emit randomComponent(id);
+      retArray[i] = id;
+      toCheckComponents[rand] = toCheckComponents[toCheckLength - 1];
+      toCheckComponents.pop();
+    }
+  }
+
+  function createQualityPlanTask() public {
+    bytes32 taskId = IOps(ops).createTimedTask(
+      0,
+      900,
+      address(this),
+      this.doQualityControl.selector,
+      address(this),
+      abi.encodeWithSelector(this.checkQualityPlanIsActive.selector),
+      ETH,
+      false
+    );
+    qualityPlanTaskId = taskId;
+  }
+
+  function checkQualityPlanIsActive()
+    public
+    view
+    returns (bool canExec, bytes memory execPayload)
+  {
+    canExec = planIsActive == true && status == CONTROL_STATUS.STILL;
+
+    execPayload = abi.encodeWithSelector(this.doQualityControl.selector);
+  }
+
+  ////// Get quality Control
+
+  function getRandomControlType() public returns (uint8 _controlType) {
+    latestRandomizingBlock = block.number;
+    uint256 _usedFunds = witnet.randomize{value: 0.1 ether}();
+
+    if (taskIdByBlock[latestRandomizingBlock] == bytes32(0)) {
+      createTaskQualityControl();
+    }
+  }
+
+  function createTaskQualityControl() public {
     bytes32 taskId = IOps(ops).createTaskNoPrepayment(
       address(this),
-      this.fulfillRandomness.selector,
+      this.qualityControlDelivered.selector,
       address(this),
       abi.encodeWithSelector(this.checkerIsRandomized.selector),
       ETH
@@ -132,26 +307,12 @@ contract ScheduleTheRandomness is OpsReady, RrpRequesterV0, VRFConsumerBaseV2, O
   {
     canExec = isRandomnize();
 
-    execPayload = abi.encodeWithSelector(this.fulfillRandomness.selector);
+    execPayload = abi.encodeWithSelector(this.qualityControlDelivered.selector);
   }
 
-
-  receive() external payable {}
-
-  function getRandomNumber() public payable {
-    latestRandomizingBlock = block.number;
-    uint256 _usedFunds = witnet.randomize{value: msg.value}();
-    if (_usedFunds < msg.value) {
-      payable(msg.sender).transfer(msg.value - _usedFunds);
-    }
-    if (taskIdByBlock[latestRandomizingBlock] == bytes32(0)) {
-      createTaskFullfillRandomness();
-    }
-  }
-
-  function fulfillRandomness() external onlyOps {
+  function qualityControlDelivered() external onlyOps {
     assert(latestRandomizingBlock > 0);
-    randomness = 1 + witnet.random(10, 0, latestRandomizingBlock);
+    randomness = 1 + witnet.random(3, 0, latestRandomizingBlock);
 
     uint256 fee;
     address feeToken;
@@ -161,7 +322,17 @@ contract ScheduleTheRandomness is OpsReady, RrpRequesterV0, VRFConsumerBaseV2, O
     _transfer(fee, feeToken);
 
     cancelTaskById(taskIdByBlock[latestRandomizingBlock]);
+
+    controls[controlId].controlType = CONTROL_TYPE(randomness);
+
+        emit controlTypeAvailable();
+    requestEmployeByChainlink();
   }
+
+
+
+
+
 
   function isRandomnize() public view returns (bool ready) {
     ready = witnet.isRandomized(latestRandomizingBlock);
@@ -172,73 +343,67 @@ contract ScheduleTheRandomness is OpsReady, RrpRequesterV0, VRFConsumerBaseV2, O
     taskIdByBlock[latestRandomizingBlock] = bytes32(0);
   }
 
-  function withdrawContract() external onlyOwner returns (bool) {
-    (bool result, ) = payable(msg.sender).call{value: address(this).balance}(
-      ""
-    );
-    return result;
+
+
+  /// @notice Sets parameters used in requesting QRNG services
+  /// @dev No access control is implemented here for convenience. This is not
+  /// secure because it allows the contract to be pointed to an arbitrary
+  /// Airnode. Normally, this function should only be callable by the "owner"
+  /// or not exist in the first place.
+  /// @param _airnode Airnode address
+  /// @param _endpointIdUint256Array Endpoint ID used to request a `uint256[]`
+  /// @param _sponsorWallet Sponsor wallet address
+  function setRequestParameters(
+    address _airnode,
+    bytes32 _endpointIdUint256Array,
+    address _sponsorWallet
+  ) external {
+    // Normally, this function should be protected, as in:
+    // require(msg.sender == owner, "Sender not owner");
+    airnode = _airnode;
+    endpointIdUint256Array = _endpointIdUint256Array;
+    sponsorWallet = _sponsorWallet;
   }
 
+  /// @notice Requests a `uint256[]`
+  /// @param size Size of the requested array
+  function makeRequestUint256Array(uint256 size) public {
+    qrngUint256Array = [0, 0];
+    bytes32 requestId = airnodeRrp.makeFullRequest(
+      airnode,
+      endpointIdUint256Array,
+      address(this),
+      sponsorWallet,
+      address(this),
+      this.fulfillUint256Array.selector,
+      // Using Airnode ABI to encode the parameters
+      abi.encode(bytes32("1u"), bytes32("size"), size)
+    );
+    //  uint256 requestId = 123;
+    expectingRequestWithIdToBeFulfilled[requestId] = true;
+    emit RequestedUint256Array(requestId, size);
+  }
 
-    /// @notice Sets parameters used in requesting QRNG services
-    /// @dev No access control is implemented here for convenience. This is not
-    /// secure because it allows the contract to be pointed to an arbitrary
-    /// Airnode. Normally, this function should only be callable by the "owner"
-    /// or not exist in the first place.
-    /// @param _airnode Airnode address
-    /// @param _endpointIdUint256Array Endpoint ID used to request a `uint256[]`
-    /// @param _sponsorWallet Sponsor wallet address
-    function setRequestParameters(
-        address _airnode,
-        bytes32 _endpointIdUint256Array,
-        address _sponsorWallet
-    ) external {
-        // Normally, this function should be protected, as in:
-        // require(msg.sender == owner, "Sender not owner");
-        airnode = _airnode;
-        endpointIdUint256Array = _endpointIdUint256Array;
-        sponsorWallet = _sponsorWallet;
-    }
-    
-    /// @notice Requests a `uint256[]`
-    /// @param size Size of the requested array
-    function makeRequestUint256Array(uint256 size) external {
-        bytes32 requestId = airnodeRrp.makeFullRequest(
-            airnode,
-            endpointIdUint256Array,
-            address(this),
-            sponsorWallet,
-            address(this),
-            this.fulfillUint256Array.selector,
-            // Using Airnode ABI to encode the parameters
-            abi.encode(bytes32("1u"), bytes32("size"), size)
-        );
-      //  uint256 requestId = 123;
-        expectingRequestWithIdToBeFulfilled[requestId] = true;
-        emit RequestedUint256Array(requestId, size);
-    }
+  /// @notice Called by the Airnode through the AirnodeRrp contract to
+  /// fulfill the request
+  /// @param requestId Request ID
+  /// @param data ABI-encoded response
+  function fulfillUint256Array(bytes32 requestId, bytes calldata data)
+    external
+    onlyAirnodeRrp
+  {
+    require(
+      expectingRequestWithIdToBeFulfilled[requestId],
+      "Request ID not known"
+    );
+    expectingRequestWithIdToBeFulfilled[requestId] = false;
+    qrngUint256Array = abi.decode(data, (uint256[]));
+    // Do what you want with `qrngUint256Array` here...
+    emit ReceivedUint256Array(requestId, qrngUint256Array);
+  }
 
-    /// @notice Called by the Airnode through the AirnodeRrp contract to
-    /// fulfill the request
-    /// @param requestId Request ID
-    /// @param data ABI-encoded response
-    function fulfillUint256Array(bytes32 requestId, bytes calldata data)
-        external
-          onlyAirnodeRrp
-    {
-        require(
-            expectingRequestWithIdToBeFulfilled[requestId],
-            "Request ID not known"
-        );
-        expectingRequestWithIdToBeFulfilled[requestId] = false;
-        qrngUint256Array = abi.decode(data, (uint256[]));
-        // Do what you want with `qrngUint256Array` here...
-        emit ReceivedUint256Array(requestId, qrngUint256Array);
-    }
-
-
-    // Assumes the subscription is funded sufficiently.
-  function requestRandomWords() external {
+  // Assumes the subscription is funded sufficiently.
+  function requestEmployeByChainlink() public {
     // Will revert if subscription is not set and funded.
     s_requestId = COORDINATOR.requestRandomWords(
       keyHash,
@@ -253,7 +418,21 @@ contract ScheduleTheRandomness is OpsReady, RrpRequesterV0, VRFConsumerBaseV2, O
     uint256, /* requestId */
     uint256[] memory randomWords
   ) internal override {
-    s_randomWords = randomWords;
+    employeeId = randomWords[0] & (500 + 1);
+    controls[controlId].employeeId = employeeId;
+    status = CONTROL_STATUS.STILL;
+    
+    emit qualityControlDone();
+  }
+
+      receive() external payable {}
+
+
+  function withdrawContract() external onlyOwner returns (bool) {
+    (bool result, ) = payable(msg.sender).call{value: address(this).balance}(
+      ""
+    );
+    return result;
   }
 
 

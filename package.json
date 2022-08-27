@@ -17,6 +17,7 @@
     "watch-tinker": "cd hardhat && nodehelpers/tinker-watch.js",
     "wire": "cd hardhat && npx hardhat --tsconfig ./tsconfig.hardhat.json run ./helpers/wire.ts",
     "tinker": "cd hardhat && npx hardhat --tsconfig ./tsconfig.hardhat.json run ./scripts/tinker.ts",
+    "tinker:delete": "cd hardhat && npx hardhat --tsconfig ./tsconfig.hardhat.json run ./scripts/tinker-delete.ts",
     "task": "cd hardhat && npx hardhat --tsconfig ./tsconfig.hardhat.json"
   },
   "private": true,

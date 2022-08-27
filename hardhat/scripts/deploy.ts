@@ -12,7 +12,7 @@ import { join } from "path";
 import { createHardhatAndFundPrivKeysFiles } from "../helpers/localAccounts";
 import * as hre from 'hardhat';
 import { ScheduleTheRandomness__factory } from "../typechain-types";
-import { initEnv } from "../helpers/utils";
+import { initEnv, waitForTx } from "../helpers/utils";
 
 const airnodeAdmin = require('@api3/airnode-admin');
 
@@ -73,14 +73,6 @@ if (network == undefined) {
   );
 
 
-  console.log(222222);
-  // Hardhat always runs the compile task when running scripts with its command
-  // line interface.
-  //
-  // If this script is run directly using `node` you may want to call compile
-  // manually to make sure everything is compiled
-  // await hre.run('compile');
-
   let artifactsPath = join(
     processDir,
     `./artifacts/contracts/${toDeployContract.artifactsPath}`
@@ -103,18 +95,6 @@ if (network == undefined) {
   );
 
 
-// Creation os API3 sponsorwallet
-const sponsorWalletAddress = await airnodeAdmin.deriveSponsorWalletAddress(
-  xpub,
-  airnode,
-  scheduleTheRandomness.address
-);
-
-console.log(
-  ' Sponsor Wallet to:',
-  sponsorWalletAddress
-);
-
 
 // Set the parameters that will be used to make Airnode requests
 // const receipt = await scheduleTheRandomness.setRequestParameters(
@@ -123,6 +103,14 @@ console.log(
 //   sponsorWalletAddress
 // );
 
+// let getPromises = [];
+// for (let i=0;i<20;i++){
+//  let pro =  scheduleTheRandomness.components(i);
+//  getPromises.push(pro)
+// }
+// const values = await Promise.all(getPromises)
+
+// console.log(values)
 
   ///// copy Interfaces and create Metadata address/abi to assets folder
   copySync(

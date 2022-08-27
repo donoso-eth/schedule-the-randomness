@@ -1,18 +1,21 @@
 <div class="grid justify-content-center flex-column align-items-center">
+ 
+ 
   <h3 *ngIf="qualityPlanStarted == false" >Start Quality Plan</h3>
 
   <button  *ngIf="qualityPlanStarted == false" pButton pRipple style=""  type="button" (click)="startQualityPlan()"
   label="Start" class="p-button-rounded mr-2 mb-2"></button>
   <h3 *ngIf="qualityPlanStarted == true">Stop Quality Plan</h3>
-  <h4 *ngIf="qualityPlanStarted == true">Last Quality plan Launched at {{qualityLaunched}}</h4> 
-  <div class="col-12">
-
+  <p *ngIf="qualityPlanStarted == true">Last Quality plan Launched at {{qualityLaunched}}</p> 
+  <p>{{planStatus}}</p>
+  <div style="text-align: center" class="col-12">
+    <p-progressSpinner *ngIf="busy"></p-progressSpinner>
     <div style=" position: relative; border-color: transparent" class="card">
       <h5>Components</h5>
       <div class="grid justify-content-center">
       <div *ngFor="let c of components" style="margin:20px;text-align: center;">
-        {{c}}
-        <div  style="margin:20px;width:50px;height:50px;background: rgb(144, 113, 12);">
+        {{c.id}} {{c.status}}
+        <div  [ngStyle]="{'background': c.status == 'checking' ? 'orange' : '#3a8d4a'}" style="margin:20px;width:50px;height:50px;background: #3a8d4a;">
        
         </div>
       </div>

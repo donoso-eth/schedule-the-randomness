@@ -17,6 +17,7 @@ import { StepsModule } from 'primeng/steps';
 import { ChartModule } from 'primeng/chart';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,7 @@ import { ToastModule } from 'primeng/toast';
     HomeRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-
+    ProgressSpinnerModule,
   
     ButtonModule,
     InputTextModule, 
