@@ -42,6 +42,7 @@ export class HomeComponent extends DappBaseComponent implements OnInit {
 
 
   async refreshStatus(){
+    this.store.dispatch(Web3Actions.chainBusy({ status: true }));
     let chain_state = await this.smartcontractService.getComponents();
   
     console.log(chain_state);
@@ -52,9 +53,8 @@ export class HomeComponent extends DappBaseComponent implements OnInit {
      foundcompo.timestamp = new Date(compoChain.timestamp*1000).toLocaleTimeString()
     }
 
- 
      console.log(this.components)
-
+     this.store.dispatch(Web3Actions.chainBusy({ status: false}));
   }
 
 
@@ -62,11 +62,10 @@ export class HomeComponent extends DappBaseComponent implements OnInit {
   async startQualityPlan() {
 
     this.qualityPlanStarted = true;
-    this.qualityLaunched = new Date().getTime()
-    this.busy = true;
-   
+  
 
-
+   let tx = await this.dapp.defaultContract?.instance?.startQualityPlan();
+   await tx?.wait();
 
 
   }
@@ -83,11 +82,13 @@ export class HomeComponent extends DappBaseComponent implements OnInit {
       if (this.qualityPlanStarted == true) {
 
           this.dapp.defaultContract?.instance.on("qualityControlStart",()=> {
-            console.log("QUALITY START")
+            console.log("QUALITY START");
+            this.refreshStatus();
           })
 
           this.dapp.defaultContract?.instance.on("qualityControlDone",()=> {
-            console.log("QUALITY FINISH")
+            console.log("QUALITY FINISH");
+            this.refreshStatus();
           })
 
           this.refreshStatus()

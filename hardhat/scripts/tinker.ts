@@ -78,7 +78,7 @@ await waitForTx  (deployer.sendTransaction({
 
 
 
-await waitForTx(scheduleTheRandomness.startQualityPlan());
+//await waitForTx(scheduleTheRandomness.startQualityPlan());
 
   };
 

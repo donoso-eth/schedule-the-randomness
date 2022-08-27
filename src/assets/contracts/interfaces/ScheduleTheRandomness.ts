@@ -22,7 +22,7 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
     "ETH()": FunctionFragment;
     "airnode()": FunctionFragment;
     "airnodeRrp()": FunctionFragment;
-    "cancelTaskById(bytes32)": FunctionFragment;
+    "cancelQualityTypeByID(bytes32)": FunctionFragment;
     "checkQualityPlanIsActive()": FunctionFragment;
     "checkerIsRandomized()": FunctionFragment;
     "components(uint8)": FunctionFragment;
@@ -40,6 +40,7 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
     "getRandomComponents()": FunctionFragment;
     "getRandomControlType()": FunctionFragment;
     "isRandomnize()": FunctionFragment;
+    "lastLaunched()": FunctionFragment;
     "latestRandomizingBlock()": FunctionFragment;
     "makeRequestAPI3RandomComponents(uint256)": FunctionFragment;
     "ops()": FunctionFragment;
@@ -69,7 +70,7 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "cancelTaskById",
+    functionFragment: "cancelQualityTypeByID",
     values: [BytesLike]
   ): string;
   encodeFunctionData(
@@ -132,6 +133,10 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "isRandomnize",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "lastLaunched",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -210,7 +215,7 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "airnode", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "airnodeRrp", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "cancelTaskById",
+    functionFragment: "cancelQualityTypeByID",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -264,6 +269,10 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "isRandomnize",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "lastLaunched",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -430,7 +439,7 @@ export interface ScheduleTheRandomness extends BaseContract {
 
     airnodeRrp(overrides?: CallOverrides): Promise<[string]>;
 
-    cancelTaskById(
+    cancelQualityTypeByID(
       _taskId: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -512,6 +521,8 @@ export interface ScheduleTheRandomness extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean] & { ready: boolean }>;
 
+    lastLaunched(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     latestRandomizingBlock(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     makeRequestAPI3RandomComponents(
@@ -592,7 +603,7 @@ export interface ScheduleTheRandomness extends BaseContract {
 
   airnodeRrp(overrides?: CallOverrides): Promise<string>;
 
-  cancelTaskById(
+  cancelQualityTypeByID(
     _taskId: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -672,6 +683,8 @@ export interface ScheduleTheRandomness extends BaseContract {
 
   isRandomnize(overrides?: CallOverrides): Promise<boolean>;
 
+  lastLaunched(overrides?: CallOverrides): Promise<BigNumber>;
+
   latestRandomizingBlock(overrides?: CallOverrides): Promise<BigNumber>;
 
   makeRequestAPI3RandomComponents(
@@ -749,7 +762,7 @@ export interface ScheduleTheRandomness extends BaseContract {
 
     airnodeRrp(overrides?: CallOverrides): Promise<string>;
 
-    cancelTaskById(
+    cancelQualityTypeByID(
       _taskId: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -816,6 +829,8 @@ export interface ScheduleTheRandomness extends BaseContract {
     getRandomControlType(overrides?: CallOverrides): Promise<number>;
 
     isRandomnize(overrides?: CallOverrides): Promise<boolean>;
+
+    lastLaunched(overrides?: CallOverrides): Promise<BigNumber>;
 
     latestRandomizingBlock(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -927,7 +942,7 @@ export interface ScheduleTheRandomness extends BaseContract {
 
     airnodeRrp(overrides?: CallOverrides): Promise<BigNumber>;
 
-    cancelTaskById(
+    cancelQualityTypeByID(
       _taskId: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -987,6 +1002,8 @@ export interface ScheduleTheRandomness extends BaseContract {
     ): Promise<BigNumber>;
 
     isRandomnize(overrides?: CallOverrides): Promise<BigNumber>;
+
+    lastLaunched(overrides?: CallOverrides): Promise<BigNumber>;
 
     latestRandomizingBlock(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1069,7 +1086,7 @@ export interface ScheduleTheRandomness extends BaseContract {
 
     airnodeRrp(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    cancelTaskById(
+    cancelQualityTypeByID(
       _taskId: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -1138,6 +1155,8 @@ export interface ScheduleTheRandomness extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     isRandomnize(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    lastLaunched(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     latestRandomizingBlock(
       overrides?: CallOverrides

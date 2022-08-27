@@ -57,6 +57,8 @@ contract ScheduleTheRandomness is
 
   CONTROL_STATUS public status; // Current Status od the Control
 
+  uint256 public lastLaunched;
+
   //// Events
 
   event qualityControlStart();
@@ -146,7 +148,7 @@ contract ScheduleTheRandomness is
 
     for (uint8 i = 1; i <= 20; i++) {
       COMPONENT memory compo = COMPONENT(
-        block.timestamp,
+       0,
         i,
         CONTROL_STATUS.STILL
       );
@@ -171,6 +173,11 @@ contract ScheduleTheRandomness is
     IOps(ops).cancelTask(qualityPlanTaskId);
     qualityPlanTaskId = bytes32(0);
     planIsActive = false;
+    if (taskIdByBlock[latestRandomizingBlock] != bytes32(0)) {
+    cancelQualityTypeByID(taskIdByBlock[latestRandomizingBlock]);
+    }
+
+
   }
 
   function createQualityPlanTask() public {
@@ -207,6 +214,8 @@ contract ScheduleTheRandomness is
 
     status = CONTROL_STATUS.CHECKING;
 
+    lastLaunched = block.timestamp;  
+
     controlId = controlId + 1;
 
     controls[controlId].id = controlId;
@@ -224,7 +233,7 @@ contract ScheduleTheRandomness is
       uint8 compoIndex = retArray[i];
       COMPONENT storage compo = components[compoIndex];
       compo.status = CONTROL_STATUS.CHECKING;
-      compo.timestamp = 0;
+      compo.timestamp = block.timestamp;
     }
 
     /// Store Quality Control Details
@@ -364,7 +373,7 @@ contract ScheduleTheRandomness is
     ready = witnet.isRandomized(latestRandomizingBlock);
   }
 
-  function cancelTaskById(bytes32 _taskId) public {
+  function cancelQualityTypeByID(bytes32 _taskId) public {
     IOps(ops).cancelTask(_taskId);
     taskIdByBlock[latestRandomizingBlock] = bytes32(0);
   }
@@ -380,7 +389,7 @@ contract ScheduleTheRandomness is
 
     _transfer(fee, feeToken);
 
-    cancelTaskById(taskIdByBlock[latestRandomizingBlock]);
+    cancelQualityTypeByID(taskIdByBlock[latestRandomizingBlock]);
 
     controls[controlId].controlType = uint8(randomness);
 
