@@ -2,17 +2,11 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-
 import "hardhat/console.sol";
-
 import "@api3/airnode-protocol/contracts/rrp/requesters/RrpRequesterV0.sol";
 
-
-
 contract ScheduleTheRandomness is
-  RrpRequesterV0
-
-{
+  RrpRequesterV0 {
 
   // #region ====== API3 QRNG STATE ================
   event RequestedUint256Array(bytes32 indexed requestId, uint256 size);
@@ -29,7 +23,6 @@ contract ScheduleTheRandomness is
   // #endregion ====== API3 QRNG STATE ================
 
   constructor(
-
     address _airnodeRrp,
     uint64 subscriptionId
   )
