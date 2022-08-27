@@ -18,8 +18,7 @@ const contract_config = JSON.parse(readFileSync( join(processDir,'contract.confi
 const tinker = async () => {
 
     // ADDRESS TO MINT TO:
-    
-  console.log('inside')
+
 
     const [deployer] = await initEnv(hre)
 
@@ -40,10 +39,7 @@ const tinker = async () => {
   
     const scheduleTheRandomness = ScheduleTheRandomness__factory.connect(metadata.address, deployer)
 
-    // let payable = ethers.utils.parseEther("0.1")
-    // await waitForTx(gelatoSuperApp.getRandomNumber({value:payable }));
 
- 
     let airnode  = "0x9d3C147cA16DB954873A498e0af5852AB39139f2"
     ////  endpointIdUint256  0xfb6d017bb87991b7495f563db3c8cf59ff87b09781947bb1e417006ad7f55a78
     let  endpointIdUint256Array  = "0x27cc2713e7f968e4e86ed274a051a5c8aaee9cca66946f23af6f29ecea9704c3";
@@ -80,7 +76,7 @@ await waitForTx  (deployer.sendTransaction({
   value: ethers.utils.parseEther("0.5")
 }));
 
-// await waitForTx(scheduleTheRandomness.addConsumer())
+
 
 await waitForTx(scheduleTheRandomness.startQualityPlan());
 

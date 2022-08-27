@@ -20,30 +20,31 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 export interface ScheduleTheRandomnessInterface extends utils.Interface {
   functions: {
     "ETH()": FunctionFragment;
-    "addConsumer()": FunctionFragment;
     "airnode()": FunctionFragment;
     "airnodeRrp()": FunctionFragment;
     "cancelTaskById(bytes32)": FunctionFragment;
     "checkQualityPlanIsActive()": FunctionFragment;
     "checkerIsRandomized()": FunctionFragment;
     "components(uint8)": FunctionFragment;
+    "controlId()": FunctionFragment;
+    "controls(uint256)": FunctionFragment;
     "createQualityPlanTask()": FunctionFragment;
     "createTaskQualityControl()": FunctionFragment;
     "doQualityControl()": FunctionFragment;
-    "employeId()": FunctionFragment;
-    "endpointIdUint256()": FunctionFragment;
+    "employeeId()": FunctionFragment;
     "endpointIdUint256Array()": FunctionFragment;
     "expectingRequestWithIdToBeFulfilled(bytes32)": FunctionFragment;
-    "fulfillUint256Array(bytes32,bytes)": FunctionFragment;
+    "fulfillRandomComponents(bytes32,bytes)": FunctionFragment;
     "gelato()": FunctionFragment;
+    "getLastControlId()": FunctionFragment;
     "getRandomComponents()": FunctionFragment;
     "getRandomControlType()": FunctionFragment;
-    "getRandomNumber()": FunctionFragment;
     "isRandomnize()": FunctionFragment;
     "latestRandomizingBlock()": FunctionFragment;
-    "makeRequestUint256Array(uint256)": FunctionFragment;
+    "makeRequestAPI3RandomComponents(uint256)": FunctionFragment;
     "ops()": FunctionFragment;
     "owner()": FunctionFragment;
+    "planIsActive()": FunctionFragment;
     "qrngUint256Array(uint256)": FunctionFragment;
     "qualityControlDelivered()": FunctionFragment;
     "randomness()": FunctionFragment;
@@ -54,6 +55,7 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
     "setRequestParameters(address,bytes32,address)": FunctionFragment;
     "sponsorWallet()": FunctionFragment;
     "startQualityPlan()": FunctionFragment;
+    "status()": FunctionFragment;
     "stopQualityControl()": FunctionFragment;
     "taskIdByBlock(uint256)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
@@ -61,10 +63,6 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
   };
 
   encodeFunctionData(functionFragment: "ETH", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "addConsumer",
-    values?: undefined
-  ): string;
   encodeFunctionData(functionFragment: "airnode", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "airnodeRrp",
@@ -86,6 +84,11 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
     functionFragment: "components",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "controlId", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "controls",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "createQualityPlanTask",
     values?: undefined
@@ -98,9 +101,8 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
     functionFragment: "doQualityControl",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "employeId", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "endpointIdUint256",
+    functionFragment: "employeeId",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -112,20 +114,20 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
     values: [BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "fulfillUint256Array",
+    functionFragment: "fulfillRandomComponents",
     values: [BytesLike, BytesLike]
   ): string;
   encodeFunctionData(functionFragment: "gelato", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "getLastControlId",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "getRandomComponents",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "getRandomControlType",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getRandomNumber",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -137,11 +139,15 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "makeRequestUint256Array",
+    functionFragment: "makeRequestAPI3RandomComponents",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "ops", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "planIsActive",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "qrngUint256Array",
     values: [BigNumberish]
@@ -182,6 +188,7 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
     functionFragment: "startQualityPlan",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "status", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "stopQualityControl",
     values?: undefined
@@ -200,10 +207,6 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
   ): string;
 
   decodeFunctionResult(functionFragment: "ETH", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "addConsumer",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "airnode", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "airnodeRrp", data: BytesLike): Result;
   decodeFunctionResult(
@@ -219,6 +222,8 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "components", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "controlId", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "controls", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "createQualityPlanTask",
     data: BytesLike
@@ -231,11 +236,7 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
     functionFragment: "doQualityControl",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "employeId", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "endpointIdUint256",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "employeeId", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "endpointIdUint256Array",
     data: BytesLike
@@ -245,20 +246,20 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "fulfillUint256Array",
+    functionFragment: "fulfillRandomComponents",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "gelato", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getLastControlId",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "getRandomComponents",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "getRandomControlType",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getRandomNumber",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -270,11 +271,15 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "makeRequestUint256Array",
+    functionFragment: "makeRequestAPI3RandomComponents",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "ops", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "planIsActive",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "qrngUint256Array",
     data: BytesLike
@@ -312,6 +317,7 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
     functionFragment: "startQualityPlan",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "status", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "stopQualityControl",
     data: BytesLike
@@ -333,14 +339,18 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
     "OwnershipTransferred(address,address)": EventFragment;
     "ReceivedUint256Array(bytes32,uint256[])": EventFragment;
     "RequestedUint256Array(bytes32,uint256)": EventFragment;
-    "qualityControl()": EventFragment;
+    "controlTypeAvailable()": EventFragment;
+    "qualityControlDone()": EventFragment;
+    "qualityControlStart()": EventFragment;
     "randomComponent(uint8)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ReceivedUint256Array"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RequestedUint256Array"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "qualityControl"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "controlTypeAvailable"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "qualityControlDone"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "qualityControlStart"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "randomComponent"): EventFragment;
 }
 
@@ -368,9 +378,20 @@ export type RequestedUint256ArrayEvent = TypedEvent<
 export type RequestedUint256ArrayEventFilter =
   TypedEventFilter<RequestedUint256ArrayEvent>;
 
-export type qualityControlEvent = TypedEvent<[], {}>;
+export type controlTypeAvailableEvent = TypedEvent<[], {}>;
 
-export type qualityControlEventFilter = TypedEventFilter<qualityControlEvent>;
+export type controlTypeAvailableEventFilter =
+  TypedEventFilter<controlTypeAvailableEvent>;
+
+export type qualityControlDoneEvent = TypedEvent<[], {}>;
+
+export type qualityControlDoneEventFilter =
+  TypedEventFilter<qualityControlDoneEvent>;
+
+export type qualityControlStartEvent = TypedEvent<[], {}>;
+
+export type qualityControlStartEventFilter =
+  TypedEventFilter<qualityControlStartEvent>;
 
 export type randomComponentEvent = TypedEvent<[number], { id: number }>;
 
@@ -405,10 +426,6 @@ export interface ScheduleTheRandomness extends BaseContract {
   functions: {
     ETH(overrides?: CallOverrides): Promise<[string]>;
 
-    addConsumer(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     airnode(overrides?: CallOverrides): Promise<[string]>;
 
     airnodeRrp(overrides?: CallOverrides): Promise<[string]>;
@@ -437,6 +454,19 @@ export interface ScheduleTheRandomness extends BaseContract {
       }
     >;
 
+    controlId(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    controls(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, number] & {
+        id: BigNumber;
+        employeeId: BigNumber;
+        controlType: number;
+      }
+    >;
+
     createQualityPlanTask(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -449,9 +479,7 @@ export interface ScheduleTheRandomness extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    employeId(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    endpointIdUint256(overrides?: CallOverrides): Promise<[string]>;
+    employeeId(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     endpointIdUint256Array(overrides?: CallOverrides): Promise<[string]>;
 
@@ -460,13 +488,17 @@ export interface ScheduleTheRandomness extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    fulfillUint256Array(
+    fulfillRandomComponents(
       requestId: BytesLike,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     gelato(overrides?: CallOverrides): Promise<[string]>;
+
+    getLastControlId(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     getRandomComponents(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -476,17 +508,13 @@ export interface ScheduleTheRandomness extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    getRandomNumber(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     isRandomnize(
       overrides?: CallOverrides
     ): Promise<[boolean] & { ready: boolean }>;
 
     latestRandomizingBlock(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    makeRequestUint256Array(
+    makeRequestAPI3RandomComponents(
       size: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -494,6 +522,8 @@ export interface ScheduleTheRandomness extends BaseContract {
     ops(overrides?: CallOverrides): Promise<[string]>;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
+
+    planIsActive(overrides?: CallOverrides): Promise<[boolean]>;
 
     qrngUint256Array(
       arg0: BigNumberish,
@@ -535,6 +565,8 @@ export interface ScheduleTheRandomness extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    status(overrides?: CallOverrides): Promise<[number]>;
+
     stopQualityControl(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -555,10 +587,6 @@ export interface ScheduleTheRandomness extends BaseContract {
   };
 
   ETH(overrides?: CallOverrides): Promise<string>;
-
-  addConsumer(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
 
   airnode(overrides?: CallOverrides): Promise<string>;
 
@@ -588,6 +616,19 @@ export interface ScheduleTheRandomness extends BaseContract {
     }
   >;
 
+  controlId(overrides?: CallOverrides): Promise<BigNumber>;
+
+  controls(
+    arg0: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber, number] & {
+      id: BigNumber;
+      employeeId: BigNumber;
+      controlType: number;
+    }
+  >;
+
   createQualityPlanTask(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -600,9 +641,7 @@ export interface ScheduleTheRandomness extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  employeId(overrides?: CallOverrides): Promise<BigNumber>;
-
-  endpointIdUint256(overrides?: CallOverrides): Promise<string>;
+  employeeId(overrides?: CallOverrides): Promise<BigNumber>;
 
   endpointIdUint256Array(overrides?: CallOverrides): Promise<string>;
 
@@ -611,13 +650,17 @@ export interface ScheduleTheRandomness extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  fulfillUint256Array(
+  fulfillRandomComponents(
     requestId: BytesLike,
     data: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   gelato(overrides?: CallOverrides): Promise<string>;
+
+  getLastControlId(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   getRandomComponents(
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -627,15 +670,11 @@ export interface ScheduleTheRandomness extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  getRandomNumber(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   isRandomnize(overrides?: CallOverrides): Promise<boolean>;
 
   latestRandomizingBlock(overrides?: CallOverrides): Promise<BigNumber>;
 
-  makeRequestUint256Array(
+  makeRequestAPI3RandomComponents(
     size: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -643,6 +682,8 @@ export interface ScheduleTheRandomness extends BaseContract {
   ops(overrides?: CallOverrides): Promise<string>;
 
   owner(overrides?: CallOverrides): Promise<string>;
+
+  planIsActive(overrides?: CallOverrides): Promise<boolean>;
 
   qrngUint256Array(
     arg0: BigNumberish,
@@ -684,6 +725,8 @@ export interface ScheduleTheRandomness extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  status(overrides?: CallOverrides): Promise<number>;
+
   stopQualityControl(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -701,8 +744,6 @@ export interface ScheduleTheRandomness extends BaseContract {
 
   callStatic: {
     ETH(overrides?: CallOverrides): Promise<string>;
-
-    addConsumer(overrides?: CallOverrides): Promise<void>;
 
     airnode(overrides?: CallOverrides): Promise<string>;
 
@@ -732,15 +773,26 @@ export interface ScheduleTheRandomness extends BaseContract {
       }
     >;
 
+    controlId(overrides?: CallOverrides): Promise<BigNumber>;
+
+    controls(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, number] & {
+        id: BigNumber;
+        employeeId: BigNumber;
+        controlType: number;
+      }
+    >;
+
     createQualityPlanTask(overrides?: CallOverrides): Promise<void>;
 
     createTaskQualityControl(overrides?: CallOverrides): Promise<void>;
 
     doQualityControl(overrides?: CallOverrides): Promise<void>;
 
-    employeId(overrides?: CallOverrides): Promise<BigNumber>;
-
-    endpointIdUint256(overrides?: CallOverrides): Promise<string>;
+    employeeId(overrides?: CallOverrides): Promise<BigNumber>;
 
     endpointIdUint256Array(overrides?: CallOverrides): Promise<string>;
 
@@ -749,7 +801,7 @@ export interface ScheduleTheRandomness extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    fulfillUint256Array(
+    fulfillRandomComponents(
       requestId: BytesLike,
       data: BytesLike,
       overrides?: CallOverrides
@@ -757,17 +809,17 @@ export interface ScheduleTheRandomness extends BaseContract {
 
     gelato(overrides?: CallOverrides): Promise<string>;
 
+    getLastControlId(overrides?: CallOverrides): Promise<BigNumber>;
+
     getRandomComponents(overrides?: CallOverrides): Promise<[number, number]>;
 
     getRandomControlType(overrides?: CallOverrides): Promise<number>;
-
-    getRandomNumber(overrides?: CallOverrides): Promise<void>;
 
     isRandomnize(overrides?: CallOverrides): Promise<boolean>;
 
     latestRandomizingBlock(overrides?: CallOverrides): Promise<BigNumber>;
 
-    makeRequestUint256Array(
+    makeRequestAPI3RandomComponents(
       size: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -775,6 +827,8 @@ export interface ScheduleTheRandomness extends BaseContract {
     ops(overrides?: CallOverrides): Promise<string>;
 
     owner(overrides?: CallOverrides): Promise<string>;
+
+    planIsActive(overrides?: CallOverrides): Promise<boolean>;
 
     qrngUint256Array(
       arg0: BigNumberish,
@@ -807,6 +861,8 @@ export interface ScheduleTheRandomness extends BaseContract {
     sponsorWallet(overrides?: CallOverrides): Promise<string>;
 
     startQualityPlan(overrides?: CallOverrides): Promise<void>;
+
+    status(overrides?: CallOverrides): Promise<number>;
 
     stopQualityControl(overrides?: CallOverrides): Promise<void>;
 
@@ -851,8 +907,14 @@ export interface ScheduleTheRandomness extends BaseContract {
       size?: null
     ): RequestedUint256ArrayEventFilter;
 
-    "qualityControl()"(): qualityControlEventFilter;
-    qualityControl(): qualityControlEventFilter;
+    "controlTypeAvailable()"(): controlTypeAvailableEventFilter;
+    controlTypeAvailable(): controlTypeAvailableEventFilter;
+
+    "qualityControlDone()"(): qualityControlDoneEventFilter;
+    qualityControlDone(): qualityControlDoneEventFilter;
+
+    "qualityControlStart()"(): qualityControlStartEventFilter;
+    qualityControlStart(): qualityControlStartEventFilter;
 
     "randomComponent(uint8)"(id?: null): randomComponentEventFilter;
     randomComponent(id?: null): randomComponentEventFilter;
@@ -860,10 +922,6 @@ export interface ScheduleTheRandomness extends BaseContract {
 
   estimateGas: {
     ETH(overrides?: CallOverrides): Promise<BigNumber>;
-
-    addConsumer(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
 
     airnode(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -883,6 +941,10 @@ export interface ScheduleTheRandomness extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    controlId(overrides?: CallOverrides): Promise<BigNumber>;
+
+    controls(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
+
     createQualityPlanTask(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -895,9 +957,7 @@ export interface ScheduleTheRandomness extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    employeId(overrides?: CallOverrides): Promise<BigNumber>;
-
-    endpointIdUint256(overrides?: CallOverrides): Promise<BigNumber>;
+    employeeId(overrides?: CallOverrides): Promise<BigNumber>;
 
     endpointIdUint256Array(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -906,13 +966,17 @@ export interface ScheduleTheRandomness extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    fulfillUint256Array(
+    fulfillRandomComponents(
       requestId: BytesLike,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     gelato(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getLastControlId(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
     getRandomComponents(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -922,15 +986,11 @@ export interface ScheduleTheRandomness extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    getRandomNumber(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     isRandomnize(overrides?: CallOverrides): Promise<BigNumber>;
 
     latestRandomizingBlock(overrides?: CallOverrides): Promise<BigNumber>;
 
-    makeRequestUint256Array(
+    makeRequestAPI3RandomComponents(
       size: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -938,6 +998,8 @@ export interface ScheduleTheRandomness extends BaseContract {
     ops(overrides?: CallOverrides): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
+
+    planIsActive(overrides?: CallOverrides): Promise<BigNumber>;
 
     qrngUint256Array(
       arg0: BigNumberish,
@@ -979,6 +1041,8 @@ export interface ScheduleTheRandomness extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    status(overrides?: CallOverrides): Promise<BigNumber>;
+
     stopQualityControl(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1000,10 +1064,6 @@ export interface ScheduleTheRandomness extends BaseContract {
 
   populateTransaction: {
     ETH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    addConsumer(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
 
     airnode(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -1027,6 +1087,13 @@ export interface ScheduleTheRandomness extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    controlId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    controls(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     createQualityPlanTask(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -1039,9 +1106,7 @@ export interface ScheduleTheRandomness extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    employeId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    endpointIdUint256(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    employeeId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     endpointIdUint256Array(
       overrides?: CallOverrides
@@ -1052,13 +1117,17 @@ export interface ScheduleTheRandomness extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    fulfillUint256Array(
+    fulfillRandomComponents(
       requestId: BytesLike,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     gelato(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getLastControlId(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
 
     getRandomComponents(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1068,17 +1137,13 @@ export interface ScheduleTheRandomness extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    getRandomNumber(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     isRandomnize(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     latestRandomizingBlock(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    makeRequestUint256Array(
+    makeRequestAPI3RandomComponents(
       size: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -1086,6 +1151,8 @@ export interface ScheduleTheRandomness extends BaseContract {
     ops(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    planIsActive(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     qrngUint256Array(
       arg0: BigNumberish,
@@ -1126,6 +1193,8 @@ export interface ScheduleTheRandomness extends BaseContract {
     startQualityPlan(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    status(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     stopQualityControl(
       overrides?: Overrides & { from?: string | Promise<string> }

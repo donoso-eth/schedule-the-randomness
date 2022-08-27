@@ -32,7 +32,7 @@ import { SmartContractService } from './shared/services/smart-contract.service';
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    DappInjectorModule.forRoot({wallet:'local', defaultNetwork:'localhost'}),
+    DappInjectorModule.forRoot({wallet:'wallet', defaultNetwork:'goerli'}),
     StoreModule.forRoot({web3: we3ReducerFunction}),
     DropdownModule,
     ProgressSpinnerModule,

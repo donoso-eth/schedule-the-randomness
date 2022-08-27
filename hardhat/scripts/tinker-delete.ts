@@ -19,7 +19,7 @@ const tinkerDelete = async () => {
 
     // ADDRESS TO MINT TO:
     
-  console.log('inside')
+
 
     const [deployer] = await initEnv(hre)
 

@@ -14,10 +14,11 @@
       <h5>Components</h5>
       <div class="grid justify-content-center">
       <div *ngFor="let c of components" style="margin:20px;text-align: center;">
-        {{c.id}} {{c.status}}
-        <div  [ngStyle]="{'background': c.status == 'checking' ? 'orange' : '#3a8d4a'}" style="margin:20px;width:50px;height:50px;background: #3a8d4a;">
+        {{c.id}} 
+        <div  [ngStyle]="{'background': c.status == 1 ? 'orange' : c.status == 2 ? 'green' :   '#6f84b7'}" style="margin:20px;width:50px;height:50px;background: #6f84b7;">
        
         </div>
+        {{c.timestamp}} 
       </div>
 
     </div>

@@ -12,7 +12,7 @@ export enum PLANSTATUS {
 }
 
 export interface ICOMPONENT {
-  id:number, status: 'still' | 'checking' | 'checked', timestamp:number}
+  id:number, status: number, timestamp:string}
 
 
 export interface IDAPP_CONFIG {

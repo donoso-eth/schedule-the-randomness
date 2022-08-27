@@ -48,7 +48,7 @@ const config: HardhatUserConfig = {
     hardhat: {
       forking: {
           url: `https://goerli.infura.io/v3/1e43f3d31eea4244bf25ed4c13bfde0e`,
-        blockNumber: 7438811,
+        blockNumber: 7480748,
       },
     },
     

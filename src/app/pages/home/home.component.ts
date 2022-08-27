@@ -27,7 +27,7 @@ export class HomeComponent extends DappBaseComponent implements OnInit {
 
   utils = utils
 
-  qualityPlanStarted = false;
+  qualityPlanStarted?:boolean;;
  
 
   qualityLaunched = 0;
@@ -40,17 +40,33 @@ export class HomeComponent extends DappBaseComponent implements OnInit {
 
   }
 
+
+  async refreshStatus(){
+    let chain_state = await this.smartcontractService.getComponents();
+  
+    console.log(chain_state);
+
+    for (const compoChain of chain_state ){
+     let foundcompo =  this.components.filter(fil=> fil.id == compoChain.id)[0];
+     foundcompo.status = compoChain.status;
+     foundcompo.timestamp = new Date(compoChain.timestamp*1000).toLocaleTimeString()
+    }
+
+ 
+     console.log(this.components)
+
+  }
+
+
+
   async startQualityPlan() {
 
     this.qualityPlanStarted = true;
     this.qualityLaunched = new Date().getTime()
     this.busy = true;
-    let qua = await this.smartcontractService.getComponents();
-    console.log(qua)
+   
 
- this.components.filter(fil=> qua.indexOf(fil.id)!== -1).map(fil=> fil.status = 'checking')
-    this.planStatus = PLANSTATUS.CHECKING_COMPONENTS;
-     console.log(this.components)
+
 
 
   }
@@ -62,8 +78,21 @@ export class HomeComponent extends DappBaseComponent implements OnInit {
   }
 
   override async hookContractConnected(): Promise<void> {
+    this.qualityPlanStarted = await this.smartcontractService.planisActive() as boolean;
 
-  
+      if (this.qualityPlanStarted == true) {
+
+          this.dapp.defaultContract?.instance.on("qualityControlStart",()=> {
+            console.log("QUALITY START")
+          })
+
+          this.dapp.defaultContract?.instance.on("qualityControlDone",()=> {
+            console.log("QUALITY FINISH")
+          })
+
+          this.refreshStatus()
+      }
+    
   }
 }
 
@@ -74,7 +103,7 @@ const createComponenst = ():Array<ICOMPONENT> => {
 const components = [];
 
   for (const id of ids){
-    let compo = { id, status:'still', timestamp:0};
+    let compo = { id, status:0, timestamp:'Not yet'};
     components.push(compo);
   }
 return components as ICOMPONENT[]
