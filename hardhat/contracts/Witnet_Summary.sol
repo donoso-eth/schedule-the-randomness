@@ -10,61 +10,10 @@ import {IOps} from "./gelato/IOps.sol";
 import "witnet-solidity-bridge/contracts/interfaces/IWitnetRandomness.sol";
 
 
-enum CONTROL_STATUS {
-  STILL,
-  CHECKING,
-  CHECKED
-}
-
-struct QUALITY_CONTROL {
-  uint256 id;
-  uint256 employeeId;
-  uint8[] checked;
-  uint8 controlType;
-}
-
-struct COMPONENT {
-  uint256 timestamp;
-  uint8 id;
-  CONTROL_STATUS status;
-}
-
 contract ScheduleTheRandomness is
   OpsReady,
   Ownable
 {
-  // #region ======  CONTRACT STATE & EVENTS ===================
-
-  uint256 intervalComponents = 3600; // minimum interval between control twice the same component
-
-  mapping(uint8 => COMPONENT) public components; /// mapping with current state of the components
-
-  uint8[] toCheckComponents; // helper array to be built dynamically with the available controls to check
-
-  bytes32 qualityPlanTaskId; // Gelato TaskId to stop the quality plan
-
-  bool public planIsActive = false; // Quality plan running or stopped
-
-  uint256 public controlId; // control number
-
-  mapping(uint256 => QUALITY_CONTROL) public controls; // Storage of all controls
-
-  CONTROL_STATUS public status; // Current Status od the Control
-
-  uint256 public lastLaunched;
-
-  //// Events
-
-  event qualityControlStart();
-
-  event randomComponent(uint8 id);
-
-  event controlTypeAvailable();
-
-  event qualityControlDone();
-
-  // #endregion ======  CONTRACT STATE ================
-
   // #region ====== WITNET RANDOMNESS CONTRACT STATE ================
 
   uint32 public randomness;
@@ -145,18 +94,6 @@ contract ScheduleTheRandomness is
     _transfer(fee, feeToken);
 
     cancelQualityTypeByID(taskIdByBlock[latestRandomizingBlock]);
-
-    controls[controlId].controlType = uint8(randomness);
-
-    for (uint8 i = 1; i <= 20; i++) {
-      COMPONENT storage _compo = components[i];
-      if (_compo.status == CONTROL_STATUS.CHECKING) {
-        _compo.status = CONTROL_STATUS.CHECKED;
-      }
-    }
-
-    emit controlTypeAvailable();
-
  
   }
 
