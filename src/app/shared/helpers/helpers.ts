@@ -1,4 +1,6 @@
-import { utils } from "ethers";
+import { Contract, Signer, utils } from "ethers";
+import { abi_ERC20 } from "./abis/erc20";
+
 
 export const displayAdress= (address: string): string => {
     return (
@@ -16,3 +18,8 @@ export const displayAdress= (address: string): string => {
     }
     return true;
   };
+
+  export const createERC20Instance = (ERC: string, signer: Signer): Contract => {
+    return new Contract(ERC, abi_ERC20, signer);
+  };
+  

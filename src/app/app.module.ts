@@ -7,6 +7,7 @@ import { DappInjectorModule } from './dapp-injector/dapp-injector.module';
 import { StoreModule } from '@ngrx/store';
 import { we3ReducerFunction } from 'angular-web3';
 
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LoadingComponent } from './shared/components/loading/loading.component';
 import { AppTopBarComponent } from './shared/components/toolbar/app.topbar.component';
 import { AppFooterComponent } from './shared/components/footer/app.footer.component';
@@ -32,6 +33,7 @@ import { SmartContractService } from './shared/services/smart-contract.service';
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,
+    BrowserAnimationsModule,
     DappInjectorModule.forRoot({wallet:'wallet', defaultNetwork:'goerli'}),
     StoreModule.forRoot({web3: we3ReducerFunction}),
     DropdownModule,

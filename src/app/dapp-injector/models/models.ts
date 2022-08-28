@@ -4,6 +4,7 @@ import { INETWORK, NETWORK_TYPE } from "../constants";
 
 
 export enum PLANSTATUS {
+  STILL = 'Not Active Quality Plan',
   WAITING = 'Waiting for next execution',
   CHECKING_COMPONENTS = 'Waiting for random components',
   CHECKING_EMPLOYEES = 'Waiting for random employee to run the control',

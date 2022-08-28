@@ -7,12 +7,12 @@ export const doSignerTransaction = async (
   let notification_message: ITRANSACTION_RESULT = {
     success: false,
     payload: '',
-    txHash:''
+
   };
 
   try {
     const tx_result: providers.TransactionResponse = await tx;
-    notification_message.txHash = tx_result.hash;
+    //notification_message.txHash = tx_result.hash;
     if (typeof tx_result.wait === 'function') {
       await tx_result.wait();
     }

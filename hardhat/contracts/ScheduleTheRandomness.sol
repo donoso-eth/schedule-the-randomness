@@ -13,6 +13,7 @@ import "@api3/airnode-protocol/contracts/rrp/requesters/RrpRequesterV0.sol";
 
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
 
 enum CONTROL_STATUS {
   STILL,
@@ -59,6 +60,8 @@ contract ScheduleTheRandomness is
 
   uint256 public lastLaunched;
 
+  uint256 public nrLaunches;
+
   //// Events
 
   event qualityControlStart();
@@ -73,12 +76,14 @@ contract ScheduleTheRandomness is
 
   // #region ======  CHAINLINK VRF STATE ================
   VRFCoordinatorV2Interface COORDINATOR;
+  LinkTokenInterface LINKTOKEN;
   // Your subscription ID.
   uint64 s_subscriptionId;
 
   // Goerli coordinator. For other networks,
   // see https://docs.chain.link/docs/vrf-contracts/#configurations
-  address vrfCoordinator = address(0x2Ca8E0C643bDe4C2E08ab1fA0da3401AdAD7734D);
+  address vrfCoordinator = 0x2Ca8E0C643bDe4C2E08ab1fA0da3401AdAD7734D;
+  address link_token_contract = 0x326C977E6efc84E512bB9C30f76E30c160eD06FB;
 
   // The gas lane to use, which specifies the maximum gas price to bump to.
   // For a list of available gas lanes on each network,
@@ -116,8 +121,6 @@ contract ScheduleTheRandomness is
   // #endregion ====== WITNET RANDOMNESS CONTRACT STATE ================
 
   // #region ====== API3 QRNG STATE ================
-  event RequestedUint256Array(bytes32 indexed requestId, uint256 size);
-  event ReceivedUint256Array(bytes32 indexed requestId, uint256[] response);
 
   mapping(bytes32 => bool) public expectingRequestWithIdToBeFulfilled;
 
@@ -142,6 +145,7 @@ contract ScheduleTheRandomness is
     witnet = _witnetRandomness;
 
     COORDINATOR = VRFCoordinatorV2Interface(vrfCoordinator);
+    LINKTOKEN = LinkTokenInterface(link_token_contract);
 
     s_owner = msg.sender;
     s_subscriptionId = subscriptionId;
@@ -158,13 +162,24 @@ contract ScheduleTheRandomness is
 
   // #region ========= STEP 1 GELATO MASTER OF CEREMONY ==============
 
-  function startQualityPlan() public {
+  function startQualityPlan() public  payable {
     require(
       planIsActive == false && qualityPlanTaskId == bytes32(0),
       "PLAN_RUNNING"
     );
+    require(msg.value == 0.3 ether,'USER_MUST_FUND_CONTRACT');
+    nrLaunches = 0;
     planIsActive = true;
+
+    payable(sponsorWallet).transfer(0.1 ether);
+
+    LINKTOKEN.transferFrom(msg.sender,address(this), 5000000000000000000);
+
+    LINKTOKEN.transferAndCall(address(COORDINATOR), 5000000000000000000, abi.encode(s_subscriptionId));
+
+
     createQualityPlanTask();
+
   }
 
   function stopQualityControl() public {
@@ -218,6 +233,8 @@ contract ScheduleTheRandomness is
 
     controlId = controlId + 1;
 
+    nrLaunches++;
+
     controls[controlId].id = controlId;
 
     uint256 fee;
@@ -248,6 +265,9 @@ contract ScheduleTheRandomness is
     }
 
     getRandomControlType();
+
+
+
   }
 
   function getRandomComponents() public returns (uint8[2] memory retArray) {
@@ -401,6 +421,12 @@ contract ScheduleTheRandomness is
     emit controlTypeAvailable();
 
     requestEmployeByChainlink();
+
+    if (nrLaunches == 10){
+
+      stopQualityControl();
+    }
+
   }
 
   //  #endregion STEP 3 GET CONTROL TYPE WITH WITNET
@@ -426,7 +452,6 @@ contract ScheduleTheRandomness is
     employeeId = randomWords[0] & (500 + 1);
     controls[controlId].employeeId = employeeId;
     status = CONTROL_STATUS.STILL;
-
     emit qualityControlDone();
   }
 

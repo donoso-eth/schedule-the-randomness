@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { DappBaseComponent, DappInjector, ICOMPONENT, PLANSTATUS, Web3Actions } from 'angular-web3';
-import { utils } from 'ethers';
+import { DappBaseComponent, DappInjector, doSignerTransaction, ICOMPONENT, PLANSTATUS, Web3Actions } from 'angular-web3';
+import { BigNumber, constants, Signer, utils } from 'ethers';
 import { MessageService } from 'primeng/api';
-import { takeUntil } from 'rxjs';
+import { createERC20Instance } from 'src/app/shared/helpers/helpers';
 import { SmartContractService } from 'src/app/shared/services/smart-contract.service';
 
 
@@ -22,13 +22,16 @@ export class HomeComponent extends DappBaseComponent implements OnInit {
 
   components:Array<ICOMPONENT> ;
 
-  planStatus: PLANSTATUS = PLANSTATUS.WAITING;
+  planStatus: PLANSTATUS = PLANSTATUS.STILL;
   busy = false;
 
-  utils = utils
+  showFundingState = false;
 
-  qualityPlanStarted?:boolean;;
- 
+  qualityPlanStarted?:boolean;balance: string | undefined;
+  linkContract: any;
+  balanceLink: any;
+;
+  LinkAdress = "0x326C977E6efc84E512bB9C30f76E30c160eD06FB";
 
   qualityLaunched = 0;
    constructor(private msg: MessageService,
@@ -36,8 +39,16 @@ export class HomeComponent extends DappBaseComponent implements OnInit {
     private router: Router, dapp: DappInjector, store: Store) {
     super(dapp, store);
     this.components = createComponenst()
+    
+  }
 
+  utils = utils;
 
+  async refreshBalance(){
+    this.balance = utils.formatEther(await this.dapp.provider?.getBalance(this.dapp.signerAddress as string) as BigNumber);
+    this.balanceLink =  utils.formatEther(await this.linkContract.balanceOf(this.dapp.signerAddress as string) as BigNumber);
+    console.log(this.balance)
+    console.log(this.balanceLink)
   }
 
 
@@ -45,38 +56,78 @@ export class HomeComponent extends DappBaseComponent implements OnInit {
     this.store.dispatch(Web3Actions.chainBusy({ status: true }));
     let chain_state = await this.smartcontractService.getComponents();
   
-    console.log(chain_state);
+
 
     for (const compoChain of chain_state ){
      let foundcompo =  this.components.filter(fil=> fil.id == compoChain.id)[0];
      foundcompo.status = compoChain.status;
+     if (compoChain.timestamp == 0) {foundcompo.timestamp='0' } else {
      foundcompo.timestamp = new Date(compoChain.timestamp*1000).toLocaleTimeString()
     }
+  }
 
-     console.log(this.components)
+  
      this.store.dispatch(Web3Actions.chainBusy({ status: false}));
   }
 
 
+  async lauchDialog(){
+    this.showFundingState = true;
+  }
+
+
+  async closeDialog(){
+    this.showFundingState = false;
+  }
 
   async startQualityPlan() {
 
-    this.qualityPlanStarted = true;
-  
+    this.showFundingState = false;
 
-   let tx = await this.dapp.defaultContract?.instance?.startQualityPlan();
+    this.store.dispatch(Web3Actions.chainBusy({ status: true }));
+
+    const resultApprove = await doSignerTransaction(this.linkContract.approve( this.dapp.defaultContract?.address, constants.MaxUint256));
+
+    this.planStatus = PLANSTATUS.WAITING;
+  
+  
+    
+   let tx = await this.dapp.defaultContract?.instance?.startQualityPlan({value: utils.parseEther('0.3')});
    await tx?.wait();
 
 
+    this.refreshBalance()
+   
+   this.store.dispatch(Web3Actions.chainBusy({ status: false }));
+
   }
+
+  async stopQuality() {
+    this.store.dispatch(Web3Actions.chainBusy({ status: true }));
+    this.planStatus = PLANSTATUS.STILL;
+  
+
+    
+   let tx = await this.dapp.defaultContract?.instance?.stopQualityControl();
+   await tx?.wait();
+
+
+   this.store.dispatch(Web3Actions.chainBusy({ status: false }));
+  }
+
+
 
   ngOnInit(): void {
     if (this.blockchain_status == 'wallet-connected'){
-    
+        
     }
   }
 
   override async hookContractConnected(): Promise<void> {
+
+    this.linkContract = createERC20Instance(this.LinkAdress, this.dapp.signer as Signer)
+
+
     this.qualityPlanStarted = await this.smartcontractService.planisActive() as boolean;
 
       if (this.qualityPlanStarted == true) {
@@ -92,7 +143,10 @@ export class HomeComponent extends DappBaseComponent implements OnInit {
           })
 
           this.refreshStatus()
+      } else {
+        this.planStatus = PLANSTATUS.STILL
       }
+      this.refreshBalance()
     
   }
 }
@@ -104,7 +158,7 @@ const createComponenst = ():Array<ICOMPONENT> => {
 const components = [];
 
   for (const id of ids){
-    let compo = { id, status:0, timestamp:'Not yet'};
+    let compo = { id, status:0, timestamp:'0'};
     components.push(compo);
   }
 return components as ICOMPONENT[]

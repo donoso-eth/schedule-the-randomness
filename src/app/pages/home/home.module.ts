@@ -34,7 +34,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
     InputTextModule, 
     InputNumberModule,
     InputTextareaModule,
-    InputSwitchModule
+    InputSwitchModule,
+    DialogModule
   ],
   providers:[]
 })

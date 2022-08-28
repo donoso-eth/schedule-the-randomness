@@ -9,6 +9,7 @@ import {
   CallOverrides,
   ContractTransaction,
   Overrides,
+  PayableOverrides,
   PopulatedTransaction,
   Signer,
   utils,
@@ -43,6 +44,7 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
     "lastLaunched()": FunctionFragment;
     "latestRandomizingBlock()": FunctionFragment;
     "makeRequestAPI3RandomComponents(uint256)": FunctionFragment;
+    "nrLaunches()": FunctionFragment;
     "ops()": FunctionFragment;
     "owner()": FunctionFragment;
     "planIsActive()": FunctionFragment;
@@ -146,6 +148,10 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "makeRequestAPI3RandomComponents",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "nrLaunches",
+    values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "ops", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
@@ -283,6 +289,7 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
     functionFragment: "makeRequestAPI3RandomComponents",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "nrLaunches", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ops", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
@@ -346,8 +353,6 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
 
   events: {
     "OwnershipTransferred(address,address)": EventFragment;
-    "ReceivedUint256Array(bytes32,uint256[])": EventFragment;
-    "RequestedUint256Array(bytes32,uint256)": EventFragment;
     "controlTypeAvailable()": EventFragment;
     "qualityControlDone()": EventFragment;
     "qualityControlStart()": EventFragment;
@@ -355,8 +360,6 @@ export interface ScheduleTheRandomnessInterface extends utils.Interface {
   };
 
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ReceivedUint256Array"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RequestedUint256Array"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "controlTypeAvailable"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "qualityControlDone"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "qualityControlStart"): EventFragment;
@@ -370,22 +373,6 @@ export type OwnershipTransferredEvent = TypedEvent<
 
 export type OwnershipTransferredEventFilter =
   TypedEventFilter<OwnershipTransferredEvent>;
-
-export type ReceivedUint256ArrayEvent = TypedEvent<
-  [string, BigNumber[]],
-  { requestId: string; response: BigNumber[] }
->;
-
-export type ReceivedUint256ArrayEventFilter =
-  TypedEventFilter<ReceivedUint256ArrayEvent>;
-
-export type RequestedUint256ArrayEvent = TypedEvent<
-  [string, BigNumber],
-  { requestId: string; size: BigNumber }
->;
-
-export type RequestedUint256ArrayEventFilter =
-  TypedEventFilter<RequestedUint256ArrayEvent>;
 
 export type controlTypeAvailableEvent = TypedEvent<[], {}>;
 
@@ -530,6 +517,8 @@ export interface ScheduleTheRandomness extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    nrLaunches(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     ops(overrides?: CallOverrides): Promise<[string]>;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
@@ -573,7 +562,7 @@ export interface ScheduleTheRandomness extends BaseContract {
     sponsorWallet(overrides?: CallOverrides): Promise<[string]>;
 
     startQualityPlan(
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     status(overrides?: CallOverrides): Promise<[number]>;
@@ -692,6 +681,8 @@ export interface ScheduleTheRandomness extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  nrLaunches(overrides?: CallOverrides): Promise<BigNumber>;
+
   ops(overrides?: CallOverrides): Promise<string>;
 
   owner(overrides?: CallOverrides): Promise<string>;
@@ -735,7 +726,7 @@ export interface ScheduleTheRandomness extends BaseContract {
   sponsorWallet(overrides?: CallOverrides): Promise<string>;
 
   startQualityPlan(
-    overrides?: Overrides & { from?: string | Promise<string> }
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   status(overrides?: CallOverrides): Promise<number>;
@@ -839,6 +830,8 @@ export interface ScheduleTheRandomness extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    nrLaunches(overrides?: CallOverrides): Promise<BigNumber>;
+
     ops(overrides?: CallOverrides): Promise<string>;
 
     owner(overrides?: CallOverrides): Promise<string>;
@@ -903,24 +896,6 @@ export interface ScheduleTheRandomness extends BaseContract {
       previousOwner?: string | null,
       newOwner?: string | null
     ): OwnershipTransferredEventFilter;
-
-    "ReceivedUint256Array(bytes32,uint256[])"(
-      requestId?: BytesLike | null,
-      response?: null
-    ): ReceivedUint256ArrayEventFilter;
-    ReceivedUint256Array(
-      requestId?: BytesLike | null,
-      response?: null
-    ): ReceivedUint256ArrayEventFilter;
-
-    "RequestedUint256Array(bytes32,uint256)"(
-      requestId?: BytesLike | null,
-      size?: null
-    ): RequestedUint256ArrayEventFilter;
-    RequestedUint256Array(
-      requestId?: BytesLike | null,
-      size?: null
-    ): RequestedUint256ArrayEventFilter;
 
     "controlTypeAvailable()"(): controlTypeAvailableEventFilter;
     controlTypeAvailable(): controlTypeAvailableEventFilter;
@@ -1012,6 +987,8 @@ export interface ScheduleTheRandomness extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    nrLaunches(overrides?: CallOverrides): Promise<BigNumber>;
+
     ops(overrides?: CallOverrides): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1055,7 +1032,7 @@ export interface ScheduleTheRandomness extends BaseContract {
     sponsorWallet(overrides?: CallOverrides): Promise<BigNumber>;
 
     startQualityPlan(
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     status(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1167,6 +1144,8 @@ export interface ScheduleTheRandomness extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    nrLaunches(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     ops(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -1210,7 +1189,7 @@ export interface ScheduleTheRandomness extends BaseContract {
     sponsorWallet(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     startQualityPlan(
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     status(overrides?: CallOverrides): Promise<PopulatedTransaction>;

@@ -83,7 +83,6 @@ export class DappInjector implements OnDestroy {
     switch (this.dappConfig.wallet) {
       case 'wallet':
         const walletResult = await this.walletInitialization();
-
         if (!!walletResult){
         this.DAPP_STATE.signer = walletResult.signer;
         this.DAPP_STATE.defaultProvider = walletResult.provider;
@@ -100,7 +99,7 @@ export class DappInjector implements OnDestroy {
         let wallet:Wallet = new Wallet(this.harhdat_local_privKeys[0].key);
         this.DAPP_STATE.signer = await wallet.connect(this.DAPP_STATE.defaultProvider!);
         this.DAPP_STATE.signerAddress = this.harhdat_local_privKeys[0].address //await this.DAPP_STATE.signer.getAddress()
-
+        this.contractInitialization();
       
         break;
 
@@ -110,12 +109,12 @@ export class DappInjector implements OnDestroy {
         privateWallet = new Wallet(privKey);
         this.DAPP_STATE.signer = await privateWallet.connect(this.DAPP_STATE.defaultProvider);
         this.DAPP_STATE.signerAddress = await this.DAPP_STATE.signer.getAddress()
-       
+        this.contractInitialization();
         break;
     }
 
 
-    this.contractInitialization();
+   
     
   } catch (error) {
       console.log(error)
@@ -130,7 +129,7 @@ async localWallet(index:number) {
   console.log(index)
   this.store.dispatch(Web3Actions.chainBusy({ status: true }));
   this.store.dispatch(Web3Actions.chainStatus({status: 'loading'}))
-  console.log(this.harhdat_local_privKeys[index-1])
+
   let wallet:Wallet = new Wallet(this.harhdat_local_privKeys[index-1].key);
   this.DAPP_STATE.signer = await wallet.connect(this.DAPP_STATE.defaultProvider!);
   this.DAPP_STATE.signerAddress = await this.DAPP_STATE.signer.getAddress()
@@ -195,6 +194,8 @@ async localWallet(index:number) {
   ///// ---------  Contract Initialization
   private async contractInitialization() {
 
+
+
     const contract = new AngularContract<ScheduleTheRandomness>({
       metadata: ScheduleRandomnessMetadata ,
       provider: this.DAPP_STATE.defaultProvider!,
@@ -223,6 +224,7 @@ async localWallet(index:number) {
   private async webModalInstanceLaunch(){
      ///// create web-modal/hoos for connection/disconection .etcc.....
      this.webModal = new Web3ModalComponent({ document: this.document }, this.store);
+    
 
      await this.webModal.loadWallets();
      this.webModal.onConnect.pipe(takeUntil(this.destroyHooks)).subscribe(async (walletConnectProvider) => {
@@ -234,8 +236,6 @@ async localWallet(index:number) {
        this.DAPP_STATE.signerAddress = await webModalSigner.getAddress()
        this.DAPP_STATE.defaultProvider = webModalProvider;
        this.DAPP_STATE.signer = webModalSigner;
-
-       
        this.contractInitialization();
      });
 
@@ -258,7 +258,8 @@ async localWallet(index:number) {
        this.DAPP_STATE.defaultContract = null;
        this.DAPP_STATE.defaultProvider = null;
      });
-
+     this.store.dispatch(Web3Actions.chainStatus({ status: 'fail-to-connect-network' }));
+     this.store.dispatch(Web3Actions.chainBusy({ status: false }));
   }
 
   /////// VIEW FUCNTIONS

@@ -1,13 +1,15 @@
 <div class="grid justify-content-center flex-column align-items-center">
  
- 
+
   <h3 *ngIf="qualityPlanStarted == false" >Start Quality Plan</h3>
 
-  <button  *ngIf="qualityPlanStarted == false" pButton pRipple style=""  type="button" (click)="startQualityPlan()"
+  <button  *ngIf="qualityPlanStarted == false" pButton pRipple style=""  type="button" (click)="lauchDialog()" 
   label="Start" class="p-button-rounded mr-2 mb-2"></button>
-  <h3 *ngIf="qualityPlanStarted == true">Stop Quality Plan</h3>
+  <h3 *ngIf="qualityPlanStarted == true">Quality Plan Launched</h3>
+  <button  *ngIf="qualityPlanStarted == true" pButton pRipple style=""  type="button" (click)="stopQuality()" 
+  label="Stop" class="p-button-rounded mr-2 mb-2"></button>
   <p *ngIf="qualityPlanStarted == true">Last Quality plan Launched at {{qualityLaunched}}</p> 
-  <p>{{planStatus}}</p>
+
   <div style="text-align: center" class="col-12">
     <p-progressSpinner *ngIf="busy"></p-progressSpinner>
     <div style=" position: relative; border-color: transparent" class="card">
@@ -18,7 +20,7 @@
         <div  [ngStyle]="{'background': c.status == 1 ? 'orange' : c.status == 2 ? 'green' :   '#6f84b7'}" style="margin:20px;width:50px;height:50px;background: #6f84b7;">
        
         </div>
-        {{c.timestamp}} 
+       <span *ngIf="c.timestamp !== '0'">{{c.timestamp}} </span> 
       </div>
 
     </div>
@@ -26,3 +28,17 @@
 
   </div>
 </div>
+<p-dialog header="Let's fund!" [(visible)]="showFundingState" [modal]="true" showEffect="fade" [style]="{ width: '50vw' }" [breakpoints]="{ '960px': '80vw' }">
+  <p class="line-height-3 m-0">
+    You are about to start the Quality Plan<br>  
+    Doing so 0.2 Eth and 5 LiNK will be transferred to the contract your ETH balance is 
+    <span style="font-weight: bold; color: var(--primary-color)"> {{balance}} </span> <br />
+    Your current LINK TOKEN Balance is  <span style="font-weight: bold; color: var(--primary-color)">  {{balanceLink}} </span>
+  
+  </p>
+  <ng-template pTemplate="footer">
+    <p-button  (click)="startQualityPlan()"  icon="pi pi-check" label="  " styleClass="mr-2"></p-button>
+    <p-button (click)="closeDialog()" icon="pi pi-times" label="  "></p-button>
+</ng-template>
+
+</p-dialog>

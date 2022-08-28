@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
 import "@api3/airnode-protocol/contracts/rrp/requesters/RrpRequesterV0.sol";
 
-contract ScheduleTheRandomness is
+contract API_ScheduleTheRandomness is
   RrpRequesterV0 {
 
   // #region ====== API3 QRNG STATE ================

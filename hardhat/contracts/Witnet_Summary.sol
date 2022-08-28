@@ -9,7 +9,7 @@ import {IOps} from "./gelato/IOps.sol";
 
 import "witnet-solidity-bridge/contracts/interfaces/IWitnetRandomness.sol";
 
-contract ScheduleTheRandomness is
+contract WITNET_ScheduleTheRandomness is
   OpsReady,
   Ownable
 {

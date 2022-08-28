@@ -101,6 +101,13 @@ export class DappBaseComponent implements OnDestroy, AfterViewInit {
        this.hookRefreshBalances();
       });
 
+      this.store
+      .pipe(web3Selectors.hookWalletNotConnected)
+      .pipe(takeUntil(this.destroyHooks))
+      .subscribe(() => {
+       this.hookWalletNotConnected()
+      });
+
 
       
 

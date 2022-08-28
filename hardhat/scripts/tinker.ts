@@ -65,16 +65,16 @@ const receipt =  await waitForTx(scheduleTheRandomness.setRequestParameters(
 ));
 
 
-  await waitForTx  (deployer.sendTransaction({
-  to: sponsorWalletAddress,
-  value: ethers.utils.parseEther("0.1")
-}));
+//   await waitForTx  (deployer.sendTransaction({
+//   to: sponsorWalletAddress,
+//   value: ethers.utils.parseEther("0.1")
+// }));
 
 
-await waitForTx  (deployer.sendTransaction({
-  to: scheduleTheRandomness.address,
-  value: ethers.utils.parseEther("0.5")
-}));
+// await waitForTx  (deployer.sendTransaction({
+//   to: scheduleTheRandomness.address,
+//   value: ethers.utils.parseEther("0.5")
+// }));
 
 
 

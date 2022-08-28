@@ -47,12 +47,12 @@ export class AppTopBarComponent extends DappBaseComponent {
 
 
   async  connect() {
-
     console.log(this.dapp.dappConfig.defaultNetwork!)
 
     if (this.dapp.dappConfig.defaultNetwork! == "localhost") {
       this.dapp.localWallet(1)
     } else {
+
       this.dapp.launchWebModal()
     }  
       
@@ -83,4 +83,11 @@ export class AppTopBarComponent extends DappBaseComponent {
  
   }
   
+override async hookFailedtoConnectNetwork(): Promise<void> {
+  console.log(88);
+ this.router.navigateByUrl('landing')
+}
+
+ 
+
 }

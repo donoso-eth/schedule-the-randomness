@@ -179,7 +179,7 @@ export class Web3ModalComponent implements AfterViewInit {
   }
 
   async web3modalAction(event: any) {
-    console.log(event);
+
     if (event == false) {
       console.log('false');
       await this.logoutOfWeb3Modal();
@@ -235,7 +235,7 @@ export class Web3ModalComponent implements AfterViewInit {
   createProviderHooks(provider: any) {
 
   console.log(' I am doing hooks')
-    console.log(provider)
+
     // Subscribe to accounts change
     provider.on('accountsChanged', (accounts: string[]) => {
       this.onConnect.emit(provider);
