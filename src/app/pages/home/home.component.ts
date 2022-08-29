@@ -27,13 +27,17 @@ export class HomeComponent extends DappBaseComponent implements OnInit {
 
   showFundingState = false;
 
-  qualityPlanStarted?:boolean;balance: string | undefined;
+  qualityPlanStarted?:boolean;
+  balance: string | undefined;
   linkContract: any;
   balanceLink: any;
 ;
   LinkAdress = "0x326C977E6efc84E512bB9C30f76E30c160eD06FB";
 
-  qualityLaunched = 0;
+  qualityLaunched = '0';
+
+  lastControl?: {status:string,id:number,employeeId:number;}
+
    constructor(private msg: MessageService,
     public smartcontractService:SmartContractService,
     private router: Router, dapp: DappInjector, store: Store) {
@@ -47,16 +51,24 @@ export class HomeComponent extends DappBaseComponent implements OnInit {
   async refreshBalance(){
     this.balance = utils.formatEther(await this.dapp.provider?.getBalance(this.dapp.signerAddress as string) as BigNumber);
     this.balanceLink =  utils.formatEther(await this.linkContract.balanceOf(this.dapp.signerAddress as string) as BigNumber);
-    console.log(this.balance)
-    console.log(this.balanceLink)
+
   }
 
 
-  async refreshStatus(){
-    this.store.dispatch(Web3Actions.chainBusy({ status: true }));
-    let chain_state = await this.smartcontractService.getComponents();
   
 
+  async refreshStatus(){
+    this.store.dispatch(Web3Actions.chainBusy({ status: true }));
+   
+    this.qualityPlanStarted = await this.smartcontractService.planisActive() as boolean;
+
+    this.qualityLaunched = new Date(+(await this.smartcontractService.planStartedAt() as BigNumber).toString()*1000).toLocaleString()
+    
+    this.lastControl = await this.smartcontractService.control()
+   
+
+    let chain_state = await this.smartcontractService.getComponents();
+  
 
     for (const compoChain of chain_state ){
      let foundcompo =  this.components.filter(fil=> fil.id == compoChain.id)[0];
@@ -98,6 +110,8 @@ export class HomeComponent extends DappBaseComponent implements OnInit {
 
     this.refreshBalance()
    
+    this.initPlan()
+    this.qualityPlanStarted == true;
    this.store.dispatch(Web3Actions.chainBusy({ status: false }));
 
   }
@@ -112,6 +126,10 @@ export class HomeComponent extends DappBaseComponent implements OnInit {
    await tx?.wait();
 
 
+  this.defaultContract.instance.removeAllListeners();
+
+    this.refreshStatus();
+
    this.store.dispatch(Web3Actions.chainBusy({ status: false }));
   }
 
@@ -122,6 +140,21 @@ export class HomeComponent extends DappBaseComponent implements OnInit {
         
     }
   }
+
+
+  initPlan() {
+    this.dapp.defaultContract?.instance.on("qualityControlStart",()=> {
+      console.log("QUALITY START");
+      this.refreshStatus();
+    })
+
+    this.dapp.defaultContract?.instance.on("qualityControlDone",()=> {
+      console.log("QUALITY FINISH");
+      this.refreshStatus();
+    })
+  }
+
+
 
   override async hookContractConnected(): Promise<void> {
 
@@ -145,6 +178,7 @@ export class HomeComponent extends DappBaseComponent implements OnInit {
           this.refreshStatus()
       } else {
         this.planStatus = PLANSTATUS.STILL
+        this.refreshStatus()
       }
       this.refreshBalance()
     

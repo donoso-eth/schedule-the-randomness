@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { DappInjector } from 'angular-web3';
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 
 
 @Injectable({
@@ -12,6 +12,32 @@ export class SmartContractService {
 
   async planisActive() {
     return  await this.dapp.defaultContract?.instance.planIsActive()
+  }
+
+  async planStartedAt() {
+    return  await this.dapp.defaultContract?.instance.lastLaunched()
+  }
+
+  async control() {
+    let status = await this.dapp.defaultContract?.instance.status();
+    let Id =  +(await this.dapp.defaultContract?.instance.controlId() as BigNumber)?.toString();
+    console.log(status,Id);
+    let activeId;
+    if (status == 0) {
+      activeId = Id;
+    } else {
+      activeId = Id-1
+    }
+    let control = (await (this.dapp.defaultContract?.instance.controls(activeId) as any))
+  
+    return { 
+      id:activeId, 
+      status: control.status == 0 ? 'Express' : control.status == 1 ? 'Medium' : 'Intensive',
+      employeeId: +(control.employeeId).toString()
+    }
+
+
+
   }
 
 

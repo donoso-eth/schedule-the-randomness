@@ -1,21 +1,26 @@
 <div class="grid justify-content-center flex-column align-items-center">
  
 
-  <h3 *ngIf="qualityPlanStarted == false" >Start Quality Plan</h3>
-
+  <p >Last Control {{qualityLaunched}}</p> 
+  <div >
+      <p class="mb-1">Last control Id: <span style="font-weight: bold; color: var(--primary-color)"> {{lastControl?.id}}</span></p>
+      <p  class="mb-1">Last employee Id: <span style="font-weight: bold; color: var(--primary-color)"> {{lastControl?.employeeId}}</span></p>
+      <p  class="mb-1">Last control type: <span style="font-weight: bold; color: var(--primary-color)"> {{lastControl?.status}}</span></p>
+  </div>
   <button  *ngIf="qualityPlanStarted == false" pButton pRipple style=""  type="button" (click)="lauchDialog()" 
-  label="Start" class="p-button-rounded mr-2 mb-2"></button>
-  <h3 *ngIf="qualityPlanStarted == true">Quality Plan Launched</h3>
+  label="Start" class="p-button-rounded mt-2 mr-2 mb-2"></button>
   <button  *ngIf="qualityPlanStarted == true" pButton pRipple style=""  type="button" (click)="stopQuality()" 
-  label="Stop" class="p-button-rounded mr-2 mb-2"></button>
-  <p *ngIf="qualityPlanStarted == true">Last Quality plan Launched at {{qualityLaunched}}</p> 
+  label="Stop" class="p-button-rounded mt-2 mr-2 mb-2"></button>
+
+
+
 
   <div style="text-align: center" class="col-12">
     <p-progressSpinner *ngIf="busy"></p-progressSpinner>
     <div style=" position: relative; border-color: transparent" class="card">
       <h5>Components</h5>
       <div class="grid justify-content-center">
-      <div *ngFor="let c of components" style="margin:20px;text-align: center;">
+      <div *ngFor="let c of components" style="margin:10px;text-align: center;">
         {{c.id}} 
         <div  [ngStyle]="{'background': c.status == 1 ? 'orange' : c.status == 2 ? 'green' :   '#6f84b7'}" style="margin:20px;width:50px;height:50px;background: #6f84b7;">
        
@@ -33,8 +38,13 @@
     You are about to start the Quality Plan<br>  
     Doing so 0.2 Eth and 5 LiNK will be transferred to the contract your ETH balance is 
     <span style="font-weight: bold; color: var(--primary-color)"> {{balance}} </span> <br />
-    Your current LINK TOKEN Balance is  <span style="font-weight: bold; color: var(--primary-color)">  {{balanceLink}} </span>
-  
+   <a href="https://goerlifaucet.com/" target="_blank">Goerli Faucet</a> ,  <a href="https://goerli-faucet.pk910.de/" target="_blank">Goerli Faucet PoW</a> 
+    <br>
+    
+    <br>
+    Your current LINK TOKEN Balance is  <span style="font-weight: bold; color: var(--primary-color)">  {{balanceLink}} </span>, if you need LINK ->    
+    <a href="https://faucets.chain.link/goerli" target="_blank">LINK Goerli Faucet</a>
+    
   </p>
   <ng-template pTemplate="footer">
     <p-button  (click)="startQualityPlan()"  icon="pi pi-check" label="  " styleClass="mr-2"></p-button>

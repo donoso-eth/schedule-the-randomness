@@ -83,11 +83,20 @@ export class DappInjector implements OnDestroy {
     switch (this.dappConfig.wallet) {
       case 'wallet':
         const walletResult = await this.walletInitialization();
+   
+        await this.webModalInstanceLaunch()
+
         if (!!walletResult){
         this.DAPP_STATE.signer = walletResult.signer;
         this.DAPP_STATE.defaultProvider = walletResult.provider;
+        setTimeout(async () => {
+          this.webModal.connectWallet()
+          
+        }, 100);
+       //  
         }
-        this.webModalInstanceLaunch()
+      
+
 
         break;
 
@@ -210,7 +219,7 @@ async localWallet(index:number) {
     const providerNetwork = await this.DAPP_STATE.defaultProvider!.getNetwork();
 
     const networkString = netWorkById(providerNetwork.chainId)?.name as string;
-    console.log(networkString);
+ 
     this.DAPP_STATE.connectedNetwork = networkString;
     this.store.dispatch(Web3Actions.setSignerNetwork({ network: networkString }));
 

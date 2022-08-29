@@ -47,7 +47,7 @@ export class AppTopBarComponent extends DappBaseComponent {
 
 
   async  connect() {
-    console.log(this.dapp.dappConfig.defaultNetwork!)
+ 
 
     if (this.dapp.dappConfig.defaultNetwork! == "localhost") {
       this.dapp.localWallet(1)
@@ -63,7 +63,7 @@ export class AppTopBarComponent extends DappBaseComponent {
     this.address_to_show = await this.dapp.signerAddress!;
 
     this.network = this.dapp.dappConfig.defaultNetwork!;
-    console.log(this.network)
+
      if (this.network == 'localhost') {
       this.harhdat_local_privKeys = (await import('../../../../assets/contracts/local_accouts.json')).default;
       const index = this.harhdat_local_privKeys.map((map) => map.address.toLowerCase()).indexOf(this.dapp.signerAddress!.toLowerCase());
@@ -84,7 +84,7 @@ export class AppTopBarComponent extends DappBaseComponent {
   }
   
 override async hookFailedtoConnectNetwork(): Promise<void> {
-  console.log(88);
+
  this.router.navigateByUrl('landing')
 }
 

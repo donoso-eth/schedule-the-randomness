@@ -47,7 +47,7 @@ export class DappBaseComponent implements OnDestroy, AfterViewInit {
       .pipe(takeUntil(this.destroyHooks))
       .subscribe(async (value) => {
         this.blockchain_status = value;
-        console.log(value);
+     
       });
 
     //////  CHAIN START LOADING

@@ -316,6 +316,7 @@ export class Web3ModalComponent implements AfterViewInit {
     await Promise.all(myPromises)
       .then(() => {
         setTimeout(async () => {
+          console.log(319)
           // this.Web3Modal = window.Web3Modal.default;on
           this.ready = true;
           const cachedProvider =   window.localStorage.getItem('WEB3_CONNECT_CACHED_PROVIDER');
